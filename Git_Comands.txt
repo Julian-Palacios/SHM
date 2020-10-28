@@ -1,0 +1,71 @@
+#Ubicarse dentro de la carpeta del proyecto: 
+#Iniciar repositorio local: 
+	git init
+	
+#Estado de archivos: Solo aparecen los que no han sido subidos con commit
+	A: para añadidos pero no commitados
+	M: que ya han sido comiteados 
+		git status -s (-s para resumen)
+		
+#Añadir file o carpetas: 
+	git add (file o dir)
+	git add . (agregar todos los archivos de la carpeta)
+	
+#Añadir Instantanea de los agregados:
+	git commit -m "Comentraio" (-m para comentario)
+	
+#Cada vez que hacemos un cambio en un archivo comiteado, hay que volver hacerle un add
+ antes de hacer un nuevo commit
+	git add "archivo actualizado o cambiado"
+	git commit -m "han habido cambios"
+	git commit -am "comentario de commit" (-am para agregar al mismo tiempo del commit)
+	
+#Ver todos los commits hechos
+	git log --oneline
+
+#Resetear a un instantánea (versión)
+	git reset --hard codigodelCommit
+	
+#Editar los comentarios de los commits 
+	git commit --amend (se abre con el editor vim)
+
+#Subir proyectoa local a repositorio en GitHub
+	-git remote add origin https://github.com/UserName/RepositoryName.git
+		#En caso de error: rep already exist: 
+			-git remote set-url origin/UserName/RepositoryName.git
+	-git push -u origin master (ingresar usuario y contraseña)
+		#En caso de ingresar un usuaio invalido:
+			-Cambiar usuario :git config user.name her_username / git config user.email her_email
+			-git config --local credential.helper ""
+			-git push origin master (Luego actualizar contraseña)
+			
+#Bajar un repositorio de git:
+	git pull https://github.com/UserName/RepositoryName.git
+	
+#Guardar un nuevo tag (para versiones terminadas):
+	-git tag nombredelTag -m "Alguna descipcion"
+	-git push tags
+
+#Clonar Repositorio:
+	git clone https://github.com/UserName/RepositoryName.git 
+	
+#Creando ramas o Branchs (Copia del master):
+	-git branch NombreDelBranchRama
+	-git brach (para ver las ramas existentes y en cual te encuentras)
+	-git checkout NombreDelBranchRama (para cambiar de rama)
+	
+#hacer merge de las ramas a la principal:
+	-git checkout master
+	-git merge NombreDelBranchRamaAUnirALMaster
+
+#Eliminar branch:
+	git branch -d NombreDelBranch (-d borrardo simpre | -D forzar borrado)
+
+#Deslogear usuario 
+	git config --global --unset user.name
+	git config --global --unset user.email
+	git config --global --unset credential.helper
+
+#Clonar Repositorio por credenciales
+	git clone https://unsername:password@github.com/repositoriOwner/RepostoriName.git
+	
