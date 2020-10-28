@@ -53,6 +53,7 @@
 	-git branch NombreDelBranchRama
 	-git brach (para ver las ramas existentes y en cual te encuentras)
 	-git checkout NombreDelBranchRama (para cambiar de rama)
+	-git branch -a (para ver todas las ramas remotas y locales)
 	
 #hacer merge de las ramas a la principal:
 	-git checkout master
