@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import signal
+from scipy import signal, integrate
 
 def GL(f, fl, n):
     """
@@ -62,6 +62,52 @@ def Butterworth_Bandpass(signal, samplig_rate, fl, fh, n):
     FFT_filtered = GL(f, fl, n)*FFT*GH(f, fh, n)
 
     return np.fft.irfft(FFT_filtered)
+
+def LeastSquares(x, y , orden):
+    """
+    Realiza un regresión polinomial por el método de mínimos cuadrados
+
+    PARÁMETROS:
+    x       : narray referente a la variable independiente. Para este caso el tiempo en segundos
+    y       : narray referente a la variable dependiente. Para este caso una señal.
+    orden   : grado del polinomio
+
+    RETORNOS:
+    rect : narray de la señal ajustada a un polinomio de grado n (orden)
+    """
+    n = orden + 1
+    m = len(x)
+    A = np.zeros((m, n))
+
+    for i in range(n):
+        A[:,i:i+1] = np.array([x**i]).T
+
+    a = inv(A.T@A)@A.T@y
+    poly_n = A@a
+
+    return poly_n.T
+
+def BaseLineCorrection(at, t, dt, n):
+    """
+    Realiza una corrección por Línea Base a un array de aceleraciones
+
+    PARÁMETROS:
+    at  : narray de aceleraciones 
+    t   : narray de tiempo
+    dt  : delta de tiempo o sampling rate del tiempo
+    n   : orden del polinomio de aproximación para la línea base
+
+    RETORNOS:
+    at  : señal de aceleraciones corregida
+    """
+    v0 = 0.0
+    u0 = 0
+    vt = integrate.cumtrapz(at, dx=dt, initial=0) + v0
+    Pvt = LeastSquares(t, vt, n)
+
+    return at - np.gradient(Pvt, dt)
+
+
 
 if __name__ == '__main__':
     paso=0.01 # paso del tiempo en s
