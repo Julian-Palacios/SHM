@@ -53,10 +53,16 @@
 	-git branch NombreDelBranchRama
 	-git brach (para ver las ramas existentes y en cual te encuentras)
 	-git checkout NombreDelBranchRama (para cambiar de rama)
+
+#Subir branch al repositorio:
+	-git push -u origin NombreDelBranchRama
 	
 #hacer merge de las ramas a la principal:
 	-git checkout master
 	-git merge NombreDelBranchRamaAUnirALMaster
+	
+#descargar branch de otro usuario colaborador del repositorio:
+	git pull origin NombreDelBranchDelotroColaborador
 
 #Eliminar branch:
 	git branch -d NombreDelBranch (-d borrardo simpre | -D forzar borrado)
@@ -69,5 +75,5 @@
 #Clonar Repositorio por credenciales
 	git clone https://unsername:password@github.com/repositoriOwner/RepostoriName.git
 
-##
+##git br
 	
