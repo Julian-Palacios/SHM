@@ -53,17 +53,14 @@
 	-git branch NombreDelBranchRama
 	-git brach (para ver las ramas existentes y en cual te encuentras)
 	-git checkout NombreDelBranchRama (para cambiar de rama)
-<<<<<<< HEAD
 
 #Subir branch al repositorio:
 	-git push -u origin NombreDelBranchRama
-=======
-	-git branch -a (para ver todas las ramas remotas y locales)
->>>>>>> italo
 	
 #hacer merge de las ramas a la principal:
 	-git checkout master
 	-git merge NombreDelBranchRamaAUnirALMaster
+	-git merge -m "message" Namebranch
 	
 #descargar branch de otro usuario colaborador del repositorio:
 	git pull origin NombreDelBranchDelotroColaborador
