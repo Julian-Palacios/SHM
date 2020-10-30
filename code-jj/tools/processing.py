@@ -1,6 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal, integrate
+from numpy.linalg import inv
+
+def cut(t, x, t0, tf):
+    """
+    Recorta la señal función del tiempo x(t) en un rango determinado.
+
+    PARÁMETROS:
+    t       : narray de tiempo
+    x       : narray señal en funcion del tiempo (t)
+    t0      : valor de tiempo de corte inferior en segundos
+    tf      : valor de tiempo de corte superios en segundos
+
+    NOTA: t0 y tf deben ser un multiplo de dt donde
+            dt la frecuencia de muestreo de la señal 
+            o paso de tiempo t, por ejemplo para los itk dt = 0.01 seg
+
+    RETORNOS:
+    x       : señal recortada
+
+    """
+    index_t0 = np.where(t == t0)[0][0]
+    index_tf = np.where(t == tf)[0][0]
+
+    return x[index_t0:index_tf+1]
 
 def GL(f, fl, n):
     """
@@ -81,7 +105,6 @@ def LeastSquares(x, y , orden):
 
     for i in range(n):
         A[:,i:i+1] = np.array([x**i]).T
-
     a = inv(A.T@A)@A.T@y
     poly_n = A@a
 
@@ -100,50 +123,70 @@ def BaseLineCorrection(at, t, dt, n):
     RETORNOS:
     at  : señal de aceleraciones corregida
     """
-    v0 = 0.0
-    u0 = 0
-    vt = integrate.cumtrapz(at, dx=dt, initial=0) + v0
+    vt = integrate.cumtrapz(at, dx=dt, initial=0.0)
     Pvt = LeastSquares(t, vt, n)
 
     return at - np.gradient(Pvt, dt)
 
-
-
 if __name__ == '__main__':
-    paso=0.01 # paso del tiempo en s
-    tf = 100.0
-    # tiempo final iniciando desde 0 en s
-    t = np.arange(0.0,tf,paso)
+    from copy import copy
 
-    # WHITE NOISE
-    mean = 0
-    std = 1
-    num_samples = int(tf/paso)
-    wn = 0.1*np.random.normal(mean, std, size = num_samples)/9.81
-    dt = paso
+    lw = 1.0
 
-    n = len(t)
-    FFT = np.fft.rfft(wn)
-    f = np.fft.rfftfreq(n, d = dt)
+    itk = 'D:/GitLab/automata/workspace/Centro_OK.txt'
+    data = np.genfromtxt(itk, delimiter=',', skip_header=1)
 
-    fl = 1.0
-    fh = 1.0
+    t, at = data[:,0] , data[:,1]
+    dt = t[1] - t[0]
 
-    x_cm = 13.0
-    y_cm = 6.0
-    lw= 0.8
-    fs = 8
-    ls = 6
-    spw = 0.2
-    alpha = 0.9
 
-    # plt.plot(t, wn, 'r', lw=0.8)
-    plt.plot(f, abs(FFT),  'r', lw=0.8)
-    plt.plot(f, abs(FFT)*GB(f, fl, fh, 20), 'b', lw=0.8)
-    plt.show()
-    plt.close()
+    plt.plot(t, BaseLineCorrection(at, t, 0.01, 3), 'green', lw=lw)
+    plt.plot(t, at, 'red', lw=lw)
+    plt.show()    
 
-    plt.plot(t, wn,  'r', lw=0.8)
-    plt.plot(t, Butterworth_Bandpass(wn, dt, fl, fh, 20), 'b', lw=0.8)
-    plt.show()
-    plt.close()
+
+
+
+
+    # # vo = -0.029529
+    # # uo = -0.005465
+    # v0 = 0
+    # u0 = 0
+
+    # #Data Original
+    # vt = integrate.cumtrapz(at, dx=dt, initial=0) + v0
+    # plt.plot(t, v_original, 'red', lw=lw)
+    # plt.plot(t, vt, 'blue', lw=lw)
+    # plt.show()
+
+    # ut = integrate.cumtrapz(vt, dx=dt, initial=0) + u0
+    # plt.plot(t, u_original, 'red', lw=lw)
+    # plt.plot(t, ut, 'blue', lw=lw)
+    # plt.show()
+
+
+    # ### TEST ###
+    # ## Paso 1
+    # w = 1
+    # vt = integrate.cumtrapz(at, dx=dt, initial=0) + v0
+    # #Pvt = parzem_smoothing(vt, w) ####################################################################################
+    # Pvt = linear(t, vt)
+    # #Pvt = least_squares(t, vt, w)
+    # # Pvt = smooth(vt, w)
+
+    # plt.title('Vt vs Smooth')
+    # plt.plot(t, vt, 'blue', lw=lw)
+    # plt.plot(t, Pvt, 'blue', lw=lw)
+    # plt.plot(t, v_original, 'green', lw=lw)
+    # plt.plot(t, vt - Pvt, 'orange', lw=lw)
+    # plt.show()
+
+    # at = at - np.gradient(Pvt, dt)  # 1er correcion
+
+
+    # # Comparacion Aceleracion corregida por velocidad
+    # plt.title('1era correcion')
+    # plt.plot(t, a_original, 'red', lw=lw, label='Original')
+    # plt.plot(t, at, 'blue', lw=lw, label='Corregida 1')
+    # plt.legend()
+    # plt.show()
