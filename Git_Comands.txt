@@ -56,6 +56,10 @@
 
 #Subir branch al repositorio:
 	-git push -u origin NombreDelBranchRama
+<<<<<<< HEAD
+=======
+	-git branch -a (para ver todas las ramas remotas y locales)
+>>>>>>> joseph
 	
 #hacer merge de las ramas a la principal:
 	-git checkout master
