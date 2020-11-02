@@ -19,6 +19,7 @@
 	git add "archivo actualizado o cambiado"
 	git commit -m "han habido cambios"
 	git commit -am "comentario de commit" (-am para agregar al mismo tiempo del commit)
+	git commit --amend (Para cambios parciales pequeños)
 	
 #Ver todos los commits hechos
 	git log --oneline
@@ -56,10 +57,7 @@
 
 #Subir branch al repositorio:
 	-git push -u origin NombreDelBranchRama
-<<<<<<< HEAD
-=======
 	-git branch -a (para ver todas las ramas remotas y locales)
->>>>>>> joseph
 	
 #hacer merge de las ramas a la principal:
 	-git checkout master
@@ -80,5 +78,5 @@
 #Clonar Repositorio por credenciales
 	git clone https://unsername:password@github.com/repositoriOwner/RepostoriName.git
 
-##git br
+
 	
