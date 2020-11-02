@@ -1,4 +1,5 @@
-import paramiko,time,os,datetime,requests
+import paramiko,os,datetime,requests
+from time import gmtime, time, sleep, strftime
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen, urlretrieve
 
@@ -93,46 +94,58 @@ def getpar(url1,stn):
         par.append(dicc)
     return par
 
-def req_evt(url1,i,par):
-    url = url1 %"print.cgi"
-    r = requests.post(url, par[i], allow_redirects=True)
-
-def getitk(n, path, url2):
-    urlW = url2 %"itk%s.txt"
-    urlW = urlW %n
 
 ################################################################
 
 url1='http://10.8.10.41/cgi-bin/%s'## Eliminar linea
 url2='http://10.8.10.41/tmp/%s'## Eliminar linea
-try:
-    l = nitk(url1)
-    even = getevent(url1)
-    # print(even)
-    fecha = '2020-10-06'
-    fechaL = '2020-10-27'
-    evS = dateS(even, fecha, fechaL)
-    print(evS)
-except Exception as e:
-    print(e)
+event_list=[]
+while True:
+    try:
+        fecha = '%s'%strftime('%Y-%m-%d', gmtime(time()-18000-30*3600*24))
+        fechaL= '%s'%strftime('%Y-%m-%d', gmtime(time()-18000))
+        l = nitk(url1)
+        even = getevent(url1)
+        evS = dateS(even, fecha, fechaL)
+        #
+    except Exception as e:
+        print(e)
+    ##
+    N_ev=len(evS)
+    if N_ev == 0:
+        print("No se encontró eventos en el intervalo de [%s,%s]"%(fecha,fechaL))
+        sleep(5)
+        continue
+    else:
+        print("Se encontró %s eventos en el intervalo de [%s,%s]"%(N_ev,fecha,fechaL))
+        pass
+    ##
+    if not evS[0][0] in event_list:
+        event_list.append(evS[0][0])
+    else:
+        print("No se encontraron nuevos eventos en el intervalo de [%s,%s]"%(fecha,fechaL))
+        sleep(5)
+        continue
+    ##
+    for j in range(len(evS)): # itera en los eventos
+        base_path = './code-jp/events'
+        event_date='%s_%s'%(evS[j][0],evS[j][0].replace(':','-'))
+        path='%s/%s'%(base_path,event_date)
+        print("Descargando registros en la carpeta:",event_date)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        # print(path)
 
-for j in range(len(evS)): # itera en los eventos
-    base_path = './Structural-Health-Monitoring/code-jp/events'
-    path='%s/%s_%s'%(base_path,evS[j][0],evS[j][0].replace(':','-'))
-    if not os.path.exists(path):
-        os.mkdir(path)
-    print(path)
-
-    for k in range(5): #itera en los sensores
-        n = "%02i" %(k)
-        stn = "itk%s" %n
-        par = getpar(url1,stn)
-        print(par[j])
-        url = url1 %"print.cgi"
-        r = requests.post(url, par[j], allow_redirects=True)
-        urlW = url2 %stn+".txt"
-        urlretrieve(urlW, r"%s\itk%s.txt" %(path, n))
-        print("url:",url,"\nurlW:",urlW)
+        for k in range(5): #itera en los sensores
+            n = "%02i" %(k)
+            stn = "itk%s" %n
+            par = getpar(url1,stn)
+            # print(par[j])
+            url = url1 %"print.cgi"
+            r = requests.post(url, par[j], allow_redirects=True)
+            urlW = url2 %stn+".txt"
+            urlretrieve(urlW, r"%s\itk%s.txt" %(path, n))
+            # print("url:",url,"\nurlW:",urlW)
 
 # carpeta="/data/eventa"
 # ssh = createSSHClient(server, port, user, password)
