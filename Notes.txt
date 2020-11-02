@@ -1,0 +1,18 @@
+####### Creacion de entorno virtual
+1) ubicarse en la carpeta desde cmd donde se tendrá alojado el entorno virtual
+2) escribir el comando: python -m venv "nombre_entorno"
+D:\django\hades>python -m venv env
+
+####### Activar entorno virtual creado
+1) ir a la ruta: env/Scripts y ejecutar el comando activate
+D:\django\hades\env\Scripts>activate
+Debería salir lo siguiente:
+(env) D:\django\hades\env\Scripts>
+
+####### Instalar librerias
+pip install django
+pip install freeze -> para ver las librerias que tenemos instaladas. Ejecutar pip freeze
+
+
+#### Instalar todas las libreris de requirements.txt
+pip install -r Requirements.txt
