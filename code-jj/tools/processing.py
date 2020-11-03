@@ -68,13 +68,13 @@ def GB(f, fl, fh, n):
     """
     return GL(f, fl, n)*GH(f, fh, n)
 
-def Butterworth_Bandpass(signal, samplig_rate, fl, fh, n):
+def Butterworth_Bandpass(signal, dt, fl, fh, n):
     """
     Hace un Butterworth Bandpass a las frecuencias de la señal
 
     inputs:                                         examples:
         signal      : señal (array)                         | array de aceleraciones
-        samplig_rate: delta de tiempo de la señal           | para itk = 0.01 seg]
+        dt          : delta de tiempo de la señal           | para itk = 0.01 seg
         fl          : low cut frecuency                     | fl = 0.10 Hz
         fh          : high cut frecuency                    | hf = 40.0 Hz
         n           : orden de corte                        | n = 15

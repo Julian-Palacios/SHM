@@ -100,15 +100,40 @@ class Waves:
 
             self.itk.append(st)
 
+    def passBandButterWorth_obspy(self):
 
-    def passBandButterWorth(self, low_freq=1.0, high_freq=25.0, order=4):
+        t0 = time.time()
+
         for itk in self.itk:
+            # itk.plot()
             for i in range(3):
-                itk[i].data = Butterworth_Bandpass(signal=itk[i].data, dt=itk[i].stats.delta, fl=low_freq, fh=high_freq, n=order)
+                itk[i].filter('bandpass', freqmin=1.0, freqmax=5.0, corners=4)
+            # itk.plot()
+        tf = time.time()
+        print("demoró:", tf - t0)
+
+    def passBandButterWorth_own(self):
+        t0 = time.time()
+        for itk in self.itk:
+            # itk.plot()
+            for i in range(3):
+                itk[i].data = Butterworth_Bandpass(signal=itk[i].data, dt=itk[i].stats.delta, fl=1.0, fh=5.0, n=4)
+            # itk.plot()
+        tf = time.time()
+        print("demoró:", tf - t0)
+
+    def passBandCompara(self):
+        for itk in self.itk:
+            # itk.plot()
+            for i in range(3):
+                plt.plot(itk[i].data,  lw=0.8, color = 'black')
+                plt.plot(Butterworth_Bandpass(signal=itk[i].data, dt=itk[i].stats.delta, fl=1.0, fh=5.0, n=2), lw=0.8, color = 'blue')
+                itk[i].filter('bandpass', freqmin=1.0, freqmax=5.0, corners=2)
+                plt.plot(itk[i].data, lw=0.8 , alpha = 0.5, color = 'red')
+                plt.show()
 
 
-
-
+  
 
 if __name__ == '__main__':
 
@@ -116,7 +141,9 @@ if __name__ == '__main__':
     CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
     # CCFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
 
-    CIIFIC.passBandButterWorth()
+    # CIIFIC.passBandButterWorth_obspy()
+    # CIIFIC.passBandButterWorth_own()
+    CIIFIC.passBandCompara()
 
     # for itk in CIIFIC.itk:
 
