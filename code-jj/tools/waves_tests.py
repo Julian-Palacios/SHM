@@ -6,6 +6,7 @@ from obspy.core.trace import Trace
 from processing import *
 import time
 import matplotlib.pyplot as plt
+from obspy.signal.detrend import polynomial
 # from obspy.signal.filter import bandpass
 
 class Waves:
@@ -132,7 +133,38 @@ class Waves:
                 plt.plot(itk[i].data, lw=0.8 , alpha = 0.5, color = 'red')
                 plt.show()
 
+    def baseLine_obspy(self, type='polynomial' , order=2, dspline=1000):
 
+        st=time.time()
+        if type=='polynomial':
+            for itk in self.itk:
+                itk.detrend(type, order=order)
+
+        if type=='spline':
+            for itk in self.itk:
+                itk.detrend(type, order=order, dspline=dspline)
+        print(time.time()-st)
+        
+    def baseLine_compare(self, order=5):
+        self.itk[0][0].data -= 0.0001 * self.itk[0][0].times() ** 3 + 0.00001 * self.itk[0][0].times() ** 5
+
+
+        plt.plot(self.itk[0][0].data, 'black', lw=0.7)
+        plt.plot(BaseLineCorrection(self.itk[0][0].data, order), 'b', lw=0.7)
+        self.itk[0].detrend('polynomial', order=order)
+        plt.plot(self.itk[0][0].data, 'red', lw=0.7)
+        plt.show()
+
+        # plt.plot(integrate.cumtrapz(self.itk[0][0].data, dx=0.01, initial=0.0), 'black', lw=0.8)
+        # vt = integrate.cumtrapz(BaseLineCorrection(self.itk[0][0].data, order), dx=0.01, initial=0.0)
+        # plt.plot(vt, 'b', lw=0.8)
+        # self.itk[0].detrend('polynomial', order=order)
+        # vt = integrate.cumtrapz(self.itk[0][0].data, dx=0.01, initial=0.0)
+        # plt.plot(vt, 'r', lw=0.8)
+        # plt.show()
+
+
+                
   
 
 if __name__ == '__main__':
@@ -140,10 +172,57 @@ if __name__ == '__main__':
     CIIFIC = Waves()
     CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
     # CCFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
+    origi= CIIFIC.itk[0][0].data
+    vt_origi = integrate.cumtrapz(origi, dx=0.01, initial=0.0)
+
+
+    at = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5
+    vt_cagado = integrate.cumtrapz(at, dx=0.01, initial=0.0)
+    # CIIFIC.itk[0].plot()
+    plt.plot(at, 'r', lw=0.7)
+    at= BaseLineCorrection(CIIFIC.itk[0][0].data, dt=CIIFIC.itk[0][0].stats.delta, type='spline', order=2, dspline=1000)
+    vt_numpy = integrate.cumtrapz(at, dx=0.01, initial=0.0)
+    plt.plot(at, 'b', lw=0.7)
+    plt.show()
+
+    # plt.plot(vt_numpy, 'g', lw=0.7)
+    # plt.show()
+
+    CIIFIC.itk[0][0].data = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5
+    plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.7)
+    CIIFIC.baseLine_obspy(type='spline' , order=2, dspline=1000)
+    plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.7)
+    plt.show()
+    
+    vt_obspy = integrate.cumtrapz(CIIFIC.itk[0][0].data, dx=0.01, initial=0.0)
+    # plt.plot(vt_obspy, 'g', lw=0.7)
+    # plt.show()
+
+    plt.plot(vt_numpy, 'b', lw=0.7)
+    plt.plot(vt_obspy, 'r', lw=0.7)
+    plt.plot(vt_origi, 'g', lw=0.7)
+    plt.show()
+    
+    plt.plot(at, 'b', lw=0.7)
+    plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.7)
+    plt.plot(origi, 'g', lw=0.7)
+    plt.show()
+
+
+
+
+    # CIIFIC.baseLine('spline', 2, 1000)
+    # CIIFIC.itk[0].plot()
+
 
     # CIIFIC.passBandButterWorth_obspy()
     # CIIFIC.passBandButterWorth_own()
-    CIIFIC.passBandCompara()
+    # CIIFIC.passBandCompara()
+
+    # CIIFIC.baseLine_obspy()
+    # CIIFIC.baseLine_compare()
+
+
 
     # for itk in CIIFIC.itk:
 

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal, integrate
 from numpy.linalg import inv
+from scipy.interpolate import LSQUnivariateSpline
 
 def cut(t, x, t0, tf):
     """
@@ -82,7 +83,7 @@ def Butterworth_Bandpass(signal, dt, fl, fh, n):
         filter      : señal filtrada (array)
     """
     FFT = np.fft.rfft(signal)
-    f = np.fft.rfftfreq(len(signal), d = samplig_rate)
+    f = np.fft.rfftfreq(len(signal), d = dt)
     FFT_filtered = GL(f, fl, n)*FFT*GH(f, fh, n)
 
     return np.fft.irfft(FFT_filtered)
@@ -110,23 +111,33 @@ def LeastSquares(x, y , orden):
 
     return poly_n.T
 
-def BaseLineCorrection(at, t, dt, n):
+def BaseLineCorrection(at, dt=0.01, type='polynomial', order=2, dspline=1000):
     """
     Realiza una corrección por Línea Base a un array de aceleraciones
 
     PARÁMETROS:
-    at  : narray de aceleraciones 
-    t   : narray de tiempo
-    dt  : delta de tiempo o sampling rate del tiempo
-    n   : orden del polinomio de aproximación para la línea base
+    at      : narray de aceleraciones 
+    dt      : delta de tiempo en seguntos. para itk=0.01s
+    type    : método de ajuste ('polynomial', 'spline')
+    order   : orden del polinomio de aproximación para la línea base
+    dspline : en caso de ser el método spline, define cada cuantos puntos se debe hacer el ajuste
 
     RETORNOS:
     at  : señal de aceleraciones corregida
     """
     vt = integrate.cumtrapz(at, dx=dt, initial=0.0)
-    Pvt = LeastSquares(t, vt, n)
+    x = np.arange(len(vt))
+    
+    if type=='polynomial':
+        fit_vt = np.polyval(np.polyfit(x, vt, deg=order), x)
+        
+    if type =='spline':
+        splknots = np.arange(dspline / 2.0, len(vt) - dspline / 2.0 + 2, dspline)
+        spl = LSQUnivariateSpline(x=x, y=vt, t=splknots, k=order)
+        fit_vt = spl(x)
 
-    return at - np.gradient(Pvt, dt)
+    return at - np.gradient(fit_vt, dt)
+    
 
 if __name__ == '__main__':
     from copy import copy
