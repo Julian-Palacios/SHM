@@ -1,0 +1,19 @@
+Para instalar Geopandas
+ir a: https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal
+Descargar:
+GDAL-3.1.4-cp38-cp38-win_amd64.whl
+Fiona-1.8.17-cp38-cp38-win_amd64.whl
+
+ubicarse en: env/Scripts
+pip install GDAL-3.1.4-cp38-cp38-win_amd64.whl
+pip install Fiona-1.8.17-cp38-cp38-win_amd64.whl
+pip install geopandas
+
+Para instalar Contextily 
+ir a: https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal
+Descargar:
+rasterio-1.1.8-cp38-cp38-win_amd64.whl
+
+ubicarse en: env/Scripts
+pip install rasterio-1.1.8-cp38-cp38-win_amd64.whl
+pip install contextily 

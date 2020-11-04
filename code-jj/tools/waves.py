@@ -16,7 +16,6 @@ class Waves:
         # self.z = []
         # self.t = []
         self.itk = []
-        self.extension = '.csv'
 
     def _ls(self, path = getcwd()):
         """
@@ -32,6 +31,7 @@ class Waves:
         titles = [itk00, itk01, ..., itk**]
         """
         l = [arch.name for arch in scandir(path) if arch.is_file()]
+        self.extension = '.' + l[0].split('.')[-1]
         n = len(l)
         numbers = np.array([int(i.split('itk')[-1].split('.')[0]) for i in l])
         numbers = np.sort(numbers)
@@ -50,7 +50,6 @@ class Waves:
         
         for i in range(len(self.names)):
             wave = np.genfromtxt(fname=dirName + '/' + self.names[i] + self.extension, delimiter=',', usecols=[2,3,4], names=channels, skip_header=4) #FIC-UNI
-            print(wave['N_S'])
             n = wave.shape[0]
             file = open(dirName + '/' + self.names[i] + self.extension, 'r')
             file.readline()
@@ -60,10 +59,9 @@ class Waves:
             line = file.readline().split(',')
             date = '20' + line[0].replace('/', '-').split(',')[0]
             hour = line[1]
-
             start_time = UTCDateTime(date + 'T' + hour)
-
             st = Stream(traces=[Trace(wave[channels[0]]), Trace(wave[channels[1]]), Trace(wave[channels[2]])])
+
             for j in range(3):
                 st[j].stats.network = self.names[i]
                 st[j].stats.station = 'FIC-UNI'
@@ -72,7 +70,6 @@ class Waves:
                 st[j].stats.starttime = start_time
                 st[j].stats.sampling_rate = 100
                 st[j].stats.npts = n 
-
             self.itk.append(st)
 
     def loadWaves_new(self, dirName):
@@ -87,8 +84,8 @@ class Waves:
             hour = line[1].split(':') # CCIFIC
             hour = ':'.join(hour[0:3]) + '.' + hour[-1] #CCIFIC
             start_time = UTCDateTime(date + 'T' + hour)
-
             st = Stream(traces=[Trace(wave[channels[0]]), Trace(wave[channels[1]]), Trace(wave[channels[2]])])
+
             for j in range(3):
                 st[j].stats.network = self.names[i]
                 st[j].stats.station = 'CIIFIC'
@@ -97,15 +94,12 @@ class Waves:
                 st[j].stats.starttime = start_time
                 st[j].stats.sampling_rate = 100.0
                 st[j].stats.npts = n 
-
             self.itk.append(st)
-
 
     def passBandButterWorth(self, low_freq=1.0, high_freq=25.0, order=4):
         for itk in self.itk:
             for i in range(3):
                 itk[i].data = Butterworth_Bandpass(signal=itk[i].data, dt=itk[i].stats.delta, fl=low_freq, fh=high_freq, n=order)
-
 
     def baseLine(self, type='polynomial' , order=2, dspline=1000):
         for itk in self.itk:
@@ -116,29 +110,29 @@ class Waves:
 if __name__ == '__main__':
 
     CIIFIC = Waves()
-    CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
-    # CCFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
+    # CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
+    CIIFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
+
+    # plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.6)
+    # CIIFIC.passBandButterWorth(1.0, 5.0, 10)
+    # plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.6)
+    # plt.show()
+
+    # CIIFIC.itk[0][0].data = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5 + 5
+    # plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.6)
+    # CIIFIC.baseLine('spline', 2, 1000)
+    # plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.6)
+    # plt.show()
 
 
-    plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.6)
-    CIIFIC.passBandButterWorth(1.0, 5.0, 10)
-    plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.6)
-    plt.show()
 
-    CIIFIC.itk[0][0].data = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5 + 5
-    plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.6)
-    CIIFIC.baseLine('spline', 2, 1000)
-    plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.6)
-    plt.show()
+    # print(CIIFIC.itk[0][0].stats.starttime)
+    # print()
+    # print(CIIFIC.itk[1][0].stats.starttime)
+    # print()
+    # print(CIIFIC.itk[2][0].stats.starttime)
+    # # for itk in CIIFIC.itk:
+    # #     for 
 
 
-    # for itk in CIIFIC.itk:
 
-    #     print("################")
-    #     print(itk[0].data)
-    #     itk[0].data = itk[0].data*0
-
-    # for itk in CIIFIC.itk:
-
-    #     print("################")
-    #     print(itk[0].data)

@@ -151,7 +151,7 @@ if __name__ == '__main__':
     dt = t[1] - t[0]
 
 
-    plt.plot(t, BaseLineCorrection(at, t, 0.01, 3), 'green', lw=lw)
+    plt.plot(t, BaseLineCorrection(at,0.01, 'spline', 2,1000), 'green', lw=lw)
     plt.plot(t, at, 'red', lw=lw)
     plt.show()    
 
