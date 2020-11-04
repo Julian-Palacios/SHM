@@ -125,18 +125,18 @@ def BaseLineCorrection(at, dt=0.01, type='polynomial', order=2, dspline=1000):
     RETORNOS:
     at  : señal de aceleraciones corregida
     """
-    vt = integrate.cumtrapz(at, dx=dt, initial=0.0)
-    x = np.arange(len(vt))
+    # vt = integrate.cumtrapz(at, dx=dt, initial=0.0)
+    x = np.arange(len(at))
     
     if type=='polynomial':
-        fit_vt = np.polyval(np.polyfit(x, vt, deg=order), x)
+        fit_at = np.polyval(np.polyfit(x, at, deg=order), x)
         
     if type =='spline':
-        splknots = np.arange(dspline / 2.0, len(vt) - dspline / 2.0 + 2, dspline)
-        spl = LSQUnivariateSpline(x=x, y=vt, t=splknots, k=order)
-        fit_vt = spl(x)
+        splknots = np.arange(dspline / 2.0, len(at) - dspline / 2.0 + 2, dspline)
+        spl = LSQUnivariateSpline(x=x, y=at, t=splknots, k=order)
+        fit_at = spl(x)
 
-    return at - np.gradient(fit_vt, dt)
+    return at - fit_at
     
 
 if __name__ == '__main__':

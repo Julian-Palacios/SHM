@@ -164,23 +164,22 @@ class Waves:
         # plt.show()
 
 
-                
-  
 
 if __name__ == '__main__':
 
     CIIFIC = Waves()
     CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
-    # CCFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
+    # CIIFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
     origi= CIIFIC.itk[0][0].data
     vt_origi = integrate.cumtrapz(origi, dx=0.01, initial=0.0)
 
 
-    at = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5
+    # at = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5
+    at = CIIFIC.itk[0][0].data + CIIFIC.itk[0][0].times()*0.05
     vt_cagado = integrate.cumtrapz(at, dx=0.01, initial=0.0)
     # CIIFIC.itk[0].plot()
     plt.plot(at, 'r', lw=0.7)
-    at= BaseLineCorrection(CIIFIC.itk[0][0].data, dt=CIIFIC.itk[0][0].stats.delta, type='spline', order=2, dspline=1000)
+    at= BaseLineCorrection(at, dt=0.01, type='spline', order=2, dspline=1000)
     vt_numpy = integrate.cumtrapz(at, dx=0.01, initial=0.0)
     plt.plot(at, 'b', lw=0.7)
     plt.show()
@@ -188,7 +187,7 @@ if __name__ == '__main__':
     # plt.plot(vt_numpy, 'g', lw=0.7)
     # plt.show()
 
-    CIIFIC.itk[0][0].data = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5
+    CIIFIC.itk[0][0].data = CIIFIC.itk[0][0].data + CIIFIC.itk[0][0].times()*0.05
     plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.7)
     CIIFIC.baseLine_obspy(type='spline' , order=2, dspline=1000)
     plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.7)
@@ -202,6 +201,13 @@ if __name__ == '__main__':
     plt.plot(vt_obspy, 'r', lw=0.7)
     plt.plot(vt_origi, 'g', lw=0.7)
     plt.show()
+
+    plt.plot(integrate.cumtrapz(vt_numpy, dx=0.01, initial=0.0), 'b', lw=0.7)
+    plt.plot(integrate.cumtrapz(vt_obspy, dx=0.01, initial=0.0), 'r', lw=0.7)
+    plt.plot(integrate.cumtrapz(vt_origi, dx=0.01, initial=0.0), 'g', lw=0.7)
+    plt.show()
+    
+
     
     plt.plot(at, 'b', lw=0.7)
     plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.7)
