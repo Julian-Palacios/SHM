@@ -139,6 +139,9 @@ class Event:
                                     'Location':['CIIFIC-FIC-UNI, Rímac, Lima', 'FIC-UNI, Rímac, Lima', 'CISMID-FIC-UNI, Rímac, Lima'],
                                     'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
                                     })
+        
+        print(np.max(np.array(self.station["PGA"])))
+        print(np.min(self.station["PGA"]))
 
         print("Stations Loaded")
 
@@ -446,10 +449,9 @@ if __name__ == '__main__':
     event = Event()
     event.load_event('D:/SHM/code-jj/Events/2020-0675.txt')
     event.load_stations('D:/SHM/code-jj/Stations')
-    event.save_event_properties('D:/SHM/code-jj/Report')
-    # print(event.epicenter)
-    event.createMap01(dpi=100)
-    event.createMap02(dpi=100)
+    # event.save_event_properties('D:/SHM/code-jj/Report')
+    # event.createMap01(dpi=100)
+    # event.createMap02(dpi=100)
     
 
     # CIIFIC = Waves()
