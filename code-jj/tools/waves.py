@@ -2,9 +2,11 @@ import numpy as np
 from pathlib import Path
 import os
 import sys
+
 from obspy.core import read, UTCDateTime
 from obspy.core.stream import Stream
 from obspy.core.trace import Trace
+from obspy.signal.trigger import recursive_sta_lta, delayed_sta_lta, z_detect, carl_sta_trig, trigger_onset
 from processing import *
 import time
 import matplotlib.pyplot as plt
@@ -12,11 +14,10 @@ import geopandas
 import pandas as pd
 from shapely.geometry import Point
 import contextily as ctx
-# from contextily.providers import ST_TERRAIN
 from adjustText import adjust_text
 import matplotlib.patheffects as PathEffects
-
-# from obspy.signal.filter import bandpass
+from scipy import signal
+from copy import copy
 
 class Waves:
 
@@ -26,14 +27,18 @@ class Waves:
         # self.z = []
         # self.t = []
         self.itk = []
+        self.itk_v = []
+        self.itk_d = []
         self.BASE_DIR = str(Path(__file__).resolve(strict=True).parent.parent).replace("\\",'/')
-        self.station = pd.DataFrame({'Latitude': [-12.0215, -11.0215], 'Longitude': [-77.0492, -76.0492], 'Name': ['CIIFIC', 'FIC-UNI']})
+        self.station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605], 
+                                    'Longitude': [-77.0191, -77.0172, -76.9759], 
+                                    'Name': ['CIIFIC', 'FIC-UNI', 'CISMID'], 
+                                    'Location':['CIIFIC-FIC-UNI, Rímac, Lima', 'FIC-UNI, Rímac, Lima', 'CISMID-FIC-UNI, Rímac, Lima'],
+                                    'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
+                                    })
+
         self.epicenter = pd.DataFrame({'Latitude': [-9.95], 'Longitude':[-78.96], 'Name': ['Epicentro']})
         
-        # self.BASE_DIR = os.getcwd().replace("\\",'/')  if "\\" in os.getcwd() else os.getcwd()
-        # print(self.BASE_DIR, type(self.BASE_DIR))
-
-
     def _ls(self, path = os.getcwd()):
         """
         Función que ordena los archivos por piso de una carpeta proporcionada para la lectura de datos.
@@ -131,7 +136,7 @@ class Waves:
             for itk in self.itk:
                 itk.detrend(type, order=order, dspline=dspline)
 
-    def createMap(self):
+    def createMap01(self):
         mkdir = self.BASE_DIR + '/Figures'
         if os.path.isdir(mkdir)==False:
             os.makedirs(mkdir)
@@ -180,10 +185,111 @@ class Waves:
         ctx.add_basemap(ax, crs='epsg:4326', source=ctx.providers.Stamen.Terrain) 
         
         fig.canvas.start_event_loop(sys.float_info.min) # Esta linea oculta la Exception in Tkinter callback
-        plt.savefig(mkdir + '/Mapa.png', dpi=300, format='png', bbox_inches='tight') 
+        plt.savefig(mkdir + '/Mapa01.png', dpi=300, format='png', bbox_inches='tight') 
         fig.clf()
         plt.close()
 
+    def createMap02(self):
+        mkdir = self.BASE_DIR + '/Figures'
+        if os.path.isdir(mkdir)==False:
+            os.makedirs(mkdir)
+
+        if len(self.station)>1:
+            dx,dy=np.max(self.station["Longitude"])-np.min(self.station["Longitude"]),np.max(self.station["Latitude"])-np.min(self.station["Latitude"])
+            marg=16*abs(dy-dx)
+            
+            if marg>=0.4:
+                marg=0.4
+
+            if dy>dx:
+                plt.rcParams["axes.xmargin"] = marg # debe ser >=0 y <=1 
+                plt.rcParams["axes.ymargin"] = 0.5*marg
+
+            else:
+                plt.rcParams["axes.ymargin"] = marg
+                plt.rcParams["axes.xmargin"] = 0.5*marg
+        else:
+            plt.rcParams["axes.xmargin"] = 0.16
+            plt.rcParams["axes.ymargin"] = 0.2
+
+        dfstation = copy(self.station)
+        dfstation["Name"] = 'Estación'
+
+
+        # Creación del geodataframe a partir del total de datos
+        gdf = geopandas.GeoDataFrame(dfstation, geometry=geopandas.points_from_xy(dfstation["Longitude"], dfstation["Latitude"]))
+        # Asignación de proyeccion en la data
+        gdf.crs = "EPSG:4326"
+        #Creación del Mapa01
+        #aspect‘auto’, ‘equal’
+        fig, ax = plt.subplots(figsize=(15,15))
+        gdf[gdf['Name']=="Estación"].plot(ax=ax, markersize = 700, color = "yellow", marker = "^", edgecolor="black", linewidth=3, label = "Estación",aspect='equal')
+
+        # Configuracion de Leyenda
+        #Posible location 'upper left', 'upper right', 'lower left', 'lower right'
+        plt.legend(prop={'size': 25},loc='lower left',title = "LEYENDA",title_fontsize=24)
+        xmin, xmax, ymin, ymax = ax.axis()
+        delta=max(ymax-ymin,xmax-xmin)
+        # Asignacion de parametros en los ejes
+        ax.axis((xmin, (xmin+delta), ymin, (ymin+delta)))
+        ax.tick_params(axis='both', which='major', labelsize=14,width=4,length = 10,direction="inout")
+        ax.tick_params(labeltop=True, labelright=True)
+        ax.tick_params(top=True, right=True)
+        #  Se coloca el norte
+        ax.text(x=(xmin+0.9*delta), y=(ymin+0.95*delta), s='N', fontsize=30, fontweight = 'bold')
+        ax.arrow((xmin+0.915*delta), (ymin+0.83*delta), 0, 0.1*delta, length_includes_head=True,
+                head_width=0.05*delta, head_length=0.106*delta, overhang=0.9*delta, facecolor='k')
+        
+        #Stations labels
+        texts=[]
+        for x, y, s in zip(self.station["Longitude"], self.station["Latitude"], self.station["Name"]):
+            txt=ax.text(x, y, s, fontsize=23,color="red",fontweight = 'heavy')
+            txt.set_path_effects([PathEffects.withStroke(linewidth=5, foreground='w')])
+            texts.append(txt)
+        
+        adjust_text(texts, arrowprops=dict(arrowstyle="->", color='r', lw=0.5))
+
+        # #Se añade el mapa base
+        ctx.add_basemap(ax, crs='epsg:4326', source=ctx.providers.OpenStreetMap.Mapnik)
+        
+        fig.canvas.start_event_loop(sys.float_info.min) # Esta linea oculta la Exception in Tkinter callback
+        plt.savefig(mkdir + '/Mapa02.png', dpi=300, format='png', bbox_inches='tight') 
+        fig.clf()
+        plt.close()
+
+    def get_vel(self):
+        
+        for i in range(len(self.names)):
+            v = Stream(traces=[ Trace(integrate.cumtrapz(self.itk[i][0].data, dx=0.01, initial=0.0)), 
+                                Trace(integrate.cumtrapz(self.itk[i][1].data, dx=0.01, initial=0.0)),
+                                Trace(integrate.cumtrapz(self.itk[i][2].data, dx=0.01, initial=0.0))])
+
+            for j in range(3):
+                v[j].stats.network = self.names[i]
+                v[j].stats.station = 'FIC-UNI'
+                v[j].stats._format = None,
+                v[j].stats.channel = self.itk[i][j].stats.channel
+                v[j].stats.starttime = self.itk[i][j].stats.starttime
+                v[j].stats.sampling_rate = 100
+                v[j].stats.npts = len(self.itk[i][j].data)
+            self.itk_v.append(v)
+
+    def get_desp(self):
+        
+        for i in range(len(self.names)):
+            d = Stream(traces=[ Trace(integrate.cumtrapz(self.itk_v[i][0].data, dx=0.01, initial=0.0)), 
+                                Trace(integrate.cumtrapz(self.itk_v[i][1].data, dx=0.01, initial=0.0)),
+                                Trace(integrate.cumtrapz(self.itk_v[i][2].data, dx=0.01, initial=0.0))])
+
+            for j in range(3):
+                d[j].stats.network = self.names[i]
+                d[j].stats.station = 'FIC-UNI'
+                d[j].stats._format = None,
+                d[j].stats.channel = self.itk[i][j].stats.channel
+                d[j].stats.starttime = self.itk[i][j].stats.starttime
+                d[j].stats.sampling_rate = 100
+                d[j].stats.npts = len(self.itk[i][j].data)
+            self.itk_d.append(d)
 
 if __name__ == '__main__':
 
@@ -191,44 +297,35 @@ if __name__ == '__main__':
     # CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
     CIIFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
 
-    # CIIFIC.createMap()
-
-    # plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.6)
-    # CIIFIC.passBandButterWorth(1.0, 5.0, 10)
-    # plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.6)
-    # plt.show()
-
-    # CIIFIC.itk[0].plot()
-
-    # CIIFIC.itk[0][0].data = CIIFIC.itk[0][0].data + np.sin(2*np.pi*0.0025*CIIFIC.itk[0][0].times())*0.5 + 5
-    # plt.plot(CIIFIC.itk[0][0].data, 'r', lw=0.6)
-    # CIIFIC.itk[0].plot()
-
-    CIIFIC.itk[0].plot()
-
-    vt = integrate.cumtrapz(CIIFIC.itk[0][2].data, dx=0.01, initial=0.0)
-    # plt.plot(vt, 'b', lw=0.7)
-    plt.plot(integrate.cumtrapz(vt, dx=0.01, initial=0.0), 'b', lw=0.7)
-
-    CIIFIC.baseLine('spline', 1, 100)
-    
-
-    vt = integrate.cumtrapz(CIIFIC.itk[0][2].data, dx=0.01, initial=0.0)
-    # plt.plot(vt, 'r', lw=0.7)
-    plt.plot(integrate.cumtrapz(vt, dx=0.01, initial=0.0), 'r', lw=0.7)
-    plt.show()
-    # plt.plot(CIIFIC.itk[0][0].data, 'b', lw=0.6)
-    # plt.show()
-
-    CIIFIC.itk[0].plot()
-
-    # print(CIIFIC.itk[0][0].stats.starttime)
-    # print()
-    # print(CIIFIC.itk[1][0].stats.starttime)
-    # print()
-    # print(CIIFIC.itk[2][0].stats.starttime)
-    # # for itk in CIIFIC.itk:
-    # #     for 
+    # CIIFIC.baseLine('spline', 1, 100)
+    # CIIFIC.passBandButterWorth(0.01,20,10)
+    CIIFIC.createMap01()
+    CIIFIC.createMap02()
 
 
+    # df = 100.0
+    # lthr = 0.0
+    # rthr = -0.15
+    # for itk in CIIFIC.itk:
+    #     # ax = plt.subplot(111)
+    #     for i in range(3):
+    #         tr=itk[i]        
+    #         # Characteristic function and trigger onsets
+    #         # cft = recursive_sta_lta(tr.data, int(1 * df), int(10. * df))
+    #         cft = z_detect(tr.data, int(20* df))
+    #         # cft = carl_sta_trig(tr.data, int(1 * df), int(10 * df), 0.8, 0.8)
+    #         # cft = delayed_sta_lta(tr.data, int(1 * df), int(10 * df))
+    #         on_of = trigger_onset(cft, lthr,rthr)
+    #         print(on_of)
 
+    #         # Plotting the results
+    #         ax = plt.subplot(211)
+    #         plt.plot(tr.data, 'k')
+    #         ymin, ymax = ax.get_ylim()
+    #         # plt.vlines(on_of[:, 0], ymin, ymax, color='r', linewidth=2)
+    #         # plt.vlines(on_of[:, 1], ymin, ymax, color='b', linewidth=2)
+    #         plt.subplot(212, sharex=ax)
+    #         plt.plot(cft, lw=0.5)
+    #         # plt.hlines([lthr, rthr], 0, len(cft), color=['r', 'b'], linestyle='--')
+    #         plt.axis('tight')
+    #         plt.show()

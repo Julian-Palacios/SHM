@@ -137,7 +137,6 @@ def BaseLineCorrection(at, dt=0.01, type='polynomial', order=2, dspline=1000):
         fit_at = spl(x)
 
     return at - fit_at
-    
 
 if __name__ == '__main__':
     from copy import copy
