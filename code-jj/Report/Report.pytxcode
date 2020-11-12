@@ -1,62 +1,67 @@
 =>PYTHONTEX#py#default#default#0#code#####75#
-lugar = 'Lamas'
-fecha = '20 de Noviembre del 2020'
-hora = '01:38:24'
-hora_UTC = '06:38:02'
-referencia = '75 km sureste de Lagunas, Loreto'
-institucion = 'IGP'
-latitud = '-9.95'
-longitud = '-78.96'
-profundidad = '46'
-magnitud = '5.7'
-nstations = 3
-=>PYTHONTEX#py#default#default#1#i#####98#
+from Python_tools.core import Event
+
+event = Event.load_event_properties('D:/SHM/code-jj/Report/Event_properties.sav')
+
+lugar = event.epicenter["Place"][0]
+fecha = event.epicenter["Date"][0]
+hora_local = event.epicenter["Local Hour"][0]
+hora_UTC = event.epicenter["UTC Hour"][0]
+referencia = event.epicenter["Venue"][0]
+institucion = event.epicenter["Institution"][0]
+latitud = event.epicenter["Latitude"][0]
+longitud = event.epicenter["Longitude"][0]
+profundidad = event.epicenter["Depth"][0]
+magnitud = event.epicenter["Magnitude"][0]
+nstations = len(event.station)
+
+=>PYTHONTEX#py#default#default#1#i#####103#
 lugar
-=>PYTHONTEX#py#default#default#2#i#####98#
+=>PYTHONTEX#py#default#default#2#i#####103#
 fecha
-=>PYTHONTEX#py#default#default#3#i#####102#
+=>PYTHONTEX#py#default#default#3#i#####107#
 fecha
-=>PYTHONTEX#py#default#default#4#i#####102#
-hora
-=>PYTHONTEX#py#default#default#5#i#####102#
+=>PYTHONTEX#py#default#default#4#i#####107#
+hora_local
+=>PYTHONTEX#py#default#default#5#i#####107#
 referencia
-=>PYTHONTEX#py#default#default#6#i#####102#
+=>PYTHONTEX#py#default#default#6#i#####107#
 institucion
-=>PYTHONTEX#py#default#default#7#i#####111#
+=>PYTHONTEX#py#default#default#7#i#####116#
 institucion
-=>PYTHONTEX#py#default#default#8#i#####111#
+=>PYTHONTEX#py#default#default#8#i#####116#
 institucion
-=>PYTHONTEX#py#default#default#9#i#####123#
-hora
-=>PYTHONTEX#py#default#default#10#i#####123#
+=>PYTHONTEX#py#default#default#9#i#####128#
+hora_local
+=>PYTHONTEX#py#default#default#10#i#####128#
 hora_UTC
-=>PYTHONTEX#py#default#default#11#i#####123#
+=>PYTHONTEX#py#default#default#11#i#####128#
 latitud
-=>PYTHONTEX#py#default#default#12#i#####123#
+=>PYTHONTEX#py#default#default#12#i#####128#
 longitud
-=>PYTHONTEX#py#default#default#13#i#####123#
+=>PYTHONTEX#py#default#default#13#i#####128#
 profundidad
-=>PYTHONTEX#py#default#default#14#i#####123#
+=>PYTHONTEX#py#default#default#14#i#####128#
 magnitud
-=>PYTHONTEX#py#default#default#15#i#####123#
+=>PYTHONTEX#py#default#default#15#i#####128#
 referencia
-=>PYTHONTEX#py#default#default#16#i#####123#
-hora
-=>PYTHONTEX#py#default#default#17#i#####123#
+=>PYTHONTEX#py#default#default#16#i#####128#
+hora_local
+=>PYTHONTEX#py#default#default#17#i#####128#
 hora_UTC
-=>PYTHONTEX#py#default#default#18#i#####123#
+=>PYTHONTEX#py#default#default#18#i#####128#
 latitud
-=>PYTHONTEX#py#default#default#19#i#####123#
+=>PYTHONTEX#py#default#default#19#i#####128#
 longitud
-=>PYTHONTEX#py#default#default#20#i#####123#
+=>PYTHONTEX#py#default#default#20#i#####128#
 profundidad
-=>PYTHONTEX#py#default#default#21#i#####123#
+=>PYTHONTEX#py#default#default#21#i#####128#
 magnitud
-=>PYTHONTEX#py#default#default#22#i#####123#
+=>PYTHONTEX#py#default#default#22#i#####128#
 referencia
-=>PYTHONTEX#py#default#default#23#i#####144#
+=>PYTHONTEX#py#default#default#23#i#####149#
 nstations
-=>PYTHONTEX#py#default#default#24#code#####148#
+=>PYTHONTEX#py#default#default#24#code#####153#
 import pandas as pd
 
 PGA_max = 3.55
@@ -64,7 +69,7 @@ direccion = 'NS'
 stationmax = 'FIC-UNI'
 stationmaxubic = 'FIC-UNI, Rímac, Lima'
 
-cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora)
+cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora_local)
 
 station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605],
                         'Longitude': [-77.0191, -77.0172, -76.9759],
@@ -73,15 +78,15 @@ station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605],
                         'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
                         })
 
-=>PYTHONTEX#py#default#default#25#i#####169#
+=>PYTHONTEX#py#default#default#25#i#####174#
 PGA_max
-=>PYTHONTEX#py#default#default#26#i#####169#
+=>PYTHONTEX#py#default#default#26#i#####174#
 direccion
-=>PYTHONTEX#py#default#default#27#i#####170#
+=>PYTHONTEX#py#default#default#27#i#####175#
 stationmax
-=>PYTHONTEX#py#default#default#28#i#####170#
+=>PYTHONTEX#py#default#default#28#i#####175#
 stationmaxubic
-=>PYTHONTEX#py#default#default#29#code#####174#
+=>PYTHONTEX#py#default#default#29#code#####179#
 
 print(r"\renewcommand{\arraystretch}{1.2}")
 print(r"\begin{longtable}{|c|c|c|c|}")

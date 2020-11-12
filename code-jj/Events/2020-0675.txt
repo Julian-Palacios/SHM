@@ -1,7 +1,7 @@
-Fecha (UTC-5)         :   2020-11-02
+Fecha (UTC-5)         :   2020-11-15
 Hora local (UTC-5)    :   08:42:16
 Latitud (°)           :   -13.0937
 Longitud (°)          :   -77.0058
 Profundidad (km)      :    27 
-Magnitud (ML)         :   4.6
+Magnitud (ML)         :   4.7
 Lugar de referencia   :   63 km al Sur-Oeste de Mala, Cañete - Lima

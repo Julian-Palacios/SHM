@@ -13,7 +13,7 @@
 
 
 %---------------------------------------------------------------%
-\graphicspath{ {../Figures/} }
+\graphicspath{ {Figures/} }
 \setlength{\parindent}{0em}
 \topmargin=0.5cm
 \usepackage[lmargin=2cm,rmargin=2cm,bottom=1cm]{geometry}
@@ -73,17 +73,22 @@ SÍSMICAS Y MITIGACIÓN DE DESASTRES\\
 \begin{document}
 
 \begin{pycode}
-lugar = 'Lamas'
-fecha = '20 de Noviembre del 2020'
-hora = '01:38:24'
-hora_UTC = '06:38:02'
-referencia = '75 km sureste de Lagunas, Loreto'
-institucion = 'IGP'
-latitud = '-9.95'
-longitud = '-78.96'
-profundidad = '46'
-magnitud = '5.7'
-nstations = 3
+from Python_tools.core import Event
+
+event = Event.load_event_properties('D:/SHM/code-jj/Report/Event_properties.sav')
+
+lugar = event.epicenter["Place"][0]
+fecha = event.epicenter["Date"][0]
+hora_local = event.epicenter["Local Hour"][0]
+hora_UTC = event.epicenter["UTC Hour"][0]
+referencia = event.epicenter["Venue"][0]
+institucion = event.epicenter["Institution"][0]
+latitud = event.epicenter["Latitude"][0]
+longitud = event.epicenter["Longitude"][0]
+profundidad = event.epicenter["Depth"][0]
+magnitud = event.epicenter["Magnitude"][0]
+nstations = len(event.station)
+
 \end{pycode}
 
 \begin{center}
@@ -99,7 +104,7 @@ RED DE MONITOREO DE EDIFICACIONES}
 \vspace{0.25cm}
 \end{center}
 
-El \py{fecha} a las \py{hora} (hora local), ocurrió un sismo con epicentro a \py{referencia} (Fuente: \py{institucion}). Las características sísmicas del evento 
+El \py{fecha} a las \py{hora_local} (hora local), ocurrió un sismo con epicentro a \py{referencia} (Fuente: \py{institucion}). Las características sísmicas del evento 
 se resumen en la Tabla (\ref{tab:tab01}) y la ubicación del epicentro, así como de las estaciones 
 acelerográficas más cercanas, se muestra en la Figura (\ref{tab:tab01}). \\
 
@@ -112,7 +117,7 @@ acelerográficas más cercanas, se muestra en la Figura (\ref{tab:tab01}). \\
             \begin{tabulary}{7.0cm}{|l|C|}
                 
             \hline
-            Hora local (UTC-5): & \py{hora} \\ \hline
+            Hora local (UTC-5): & \py{hora_local} \\ \hline
             Hora UTC 0: & \py{hora_UTC} \\ \hline
             Latitud ($^{\circ}$): & \py{latitud} \\ \hline
             Longitud ($^{\circ}$): & \py{longitud} \\ \hline
@@ -153,7 +158,7 @@ direccion = 'NS'
 stationmax = 'FIC-UNI'
 stationmaxubic = 'FIC-UNI, Rímac, Lima'
 
-cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora)
+cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora_local)
 
 station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605], 
                         'Longitude': [-77.0191, -77.0172, -76.9759], 
