@@ -20,6 +20,20 @@ from scipy import signal
 from copy import copy
 import pickle
 
+#
+pd.set_option("display.max_rows", None, "display.max_columns", None)
+
+station_params = {
+    '001':{'Id':'PABUNI', 'Name':'Pabellón Central UNI','Latitude':-12.0236, 'Longitude':-77.0483, 'Location':'Pabellón-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Format':'new', 'Channels':["NS","EW","UD"]},
+    '002':{'Id':'FICUNI', 'Name':'Facultad de Ingeniería Civil UNI','Latitude': -12.0218, 'Longitude': -77.049, 'Location':'FIC-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Format':'old', 'Channels':["EW","NS","UD"]},
+    '003':{'Id':'HERMBA', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Format':'', 'Channels':["NS", "EW", "UD"]},
+    '004':{'Id':'CIPTAR', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Format':'', 'Channels':["NS", "EW", "UD"]},
+    '005':{'Id':'MLAMAS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Format':'', 'Channels':["NS", "EW", "UD"]},
+    '006':{'Id':'CIIFIC', 'Name':'CIIFIC UNI','Latitude': -12.0215, 'Longitude': -77.0492, 'Location':'CIIFIC-UNI, Rímac-Lima', 'Floors':8, 'N Sensors':4, 'Format':'new', 'Channels':["NS", "EW", "UD"]},
+    '007':{'Id':'CCEMOS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Format':'', 'Channels':["NS", "EW", "UD"]},
+    '008':{'Id':'LABEST', 'Name':'Laboratorio de Estructuras CISMID','Latitude': 0.0, 'Longitude': 0.0, 'Location':'CISMID FIC-UNI', 'Floors':2, 'N Sensors':2, 'Format':'new', 'Channels':["NS", "EW", "UD"]},
+    }
+
 def GL(f, fl, n):
     """
     Hace un low cut al array de frecuencias
@@ -70,9 +84,11 @@ def Butterworth_Bandpass(signal, dt, fl, fh, n):
 class Event:
 
     def __init__(self):
-        self.station = ''
         self.epicenter = ''
         self.BASE_DIR = str(Path(__file__).resolve(strict=True).parent.parent).replace("\\",'/')
+        self.event_waves_dir = ''
+        self.station = pd.DataFrame({'Id':[], 'Cod':[],'Latitude': [], 'Longitude': [], 'Name': [], 'Location':[], 'PGAs':[], 'Channels':[]})
+        self.PGA_max = None
 
     def load_event(self, path_event):
         """
@@ -105,7 +121,8 @@ class Event:
                 venue = venue[1:]
             else:
                 break  
-        
+        # Capeta con los datos de los itks
+        self.event_waves_dir = file.readline().split(' ')[-1].strip('\n')
         # Institucion
         inst = 'IGP'
         # lugar
@@ -127,23 +144,42 @@ class Event:
                                         })
         print("Event Loaded")
 
-    def load_stations(self, path_stations):
+    def add_station(self, station):
         """
-        Método que carga las estaciones detectadas
+        Método que carga las propiedades de la estación
 
-        path_stations   : ruta de la carpeta que contiene las subcarpetas de cada estación
+        station   : Objetod de la clases Station
         """
-        self.station = pd.DataFrame({'Latitude': [-12.14, -12.0976, -12.0605], 
-                                    'Longitude': [-76.94, -77.0172, -76.9759], 
-                                    'Name': ['CIIFIC', 'FIC-UNI', 'CISMID'], 
-                                    'Location':['CIIFIC-FIC-UNI, Rímac, Lima', 'FIC-UNI, Rímac, Lima', 'CISMID-FIC-UNI, Rímac, Lima'],
-                                    'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
-                                    })
-        
-        print(np.max(np.array(self.station["PGA"])))
-        print(np.min(self.station["PGA"]))
+        cod = station.cod
+        row = pd.DataFrame({
+            'Id':[station_params[cod]['Id']],
+            'Cod':[cod],
+            'Latitude': [station_params[cod]['Latitude']], 
+            'Longitude': [station_params[cod]['Longitude']], 
+            'Name': [station_params[cod]['Name']],
+            'Location':[station_params[cod]['Location']],
+            'PGAs':[station.get_PGA()],
+            'Channels':[station_params[cod]['Channels']]
+                            })
 
-        print("Stations Loaded")
+        self.station = self.station.append(row, ignore_index=True)
+        print("Station {} - {} Added".format(cod, station_params[cod]['Id']))
+
+    def get_max_station(self):
+        # self.station["PGAs"][0] = [1,-865246,8]
+        z1 = lambda row: np.min(row) if np.absolute(np.min(row)) > np.absolute(np.max(row)) else np.max(row)
+        self.station["Max_pga"] = self.station["PGAs"].apply(z1)
+        PGA_max = z1(self.station["Max_pga"])
+
+        z2 = lambda x: True if x == PGA_max else False
+        self.station["Is_max_station"] = self.station["Max_pga"].apply(z2)
+
+        z3 = lambda a,b,c: ''.join([b[i] if a[i]==c else '' for i in range(3)])
+        self.station['Channel_max_pga'] = [ z3(self.station["PGAs"][i], self.station["Channels"][i], self.station["Max_pga"][i]) for i in range(self.station.shape[0])]
+
+        self.max_station = self.station[self.station["Is_max_station"]]
+
+        print("Max Station got")
 
     def createMap01(self, dpi=300):
         mkdir = self.BASE_DIR + '/Figures'
@@ -293,7 +329,7 @@ class Event:
 
         return event
 
-class Waves:
+class Station:
 
     def __init__(self):
         # self.x = []
@@ -304,14 +340,7 @@ class Waves:
         self.itk_v = []
         self.itk_d = []
         self.BASE_DIR = str(Path(__file__).resolve(strict=True).parent.parent).replace("\\",'/')
-        # self.station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605], 
-        #                             'Longitude': [-77.0191, -77.0172, -76.9759], 
-        #                             'Name': ['CIIFIC', 'FIC-UNI', 'CISMID'], 
-        #                             'Location':['CIIFIC-FIC-UNI, Rímac, Lima', 'FIC-UNI, Rímac, Lima', 'CISMID-FIC-UNI, Rímac, Lima'],
-        #                             'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
-        #                             })
-
-        # self.epicenter = pd.DataFrame({'Latitude': [-9.95], 'Longitude':[-78.96], 'Name': ['Epicentro']})
+        self.cod = ''
         
     def _ls(self, path = os.getcwd()):
         """
@@ -340,28 +369,27 @@ class Waves:
                 titles.append('itk' + str(i))	
         return titles
 
-    def loadWaves_old(self, dirName):
-        channels = ["N_S", "E_W", "U_D"] # FIC-UNI
-        scale = 4280
+    def loadStation(self, dirName):
+        self.cod = dirName.split('/')[-1]
+
+        if station_params[self.cod]['Format'] == 'new':
+            skip_header, usecols, scale, delimiter = 0, [2,3,4], 1, ','
+        
+        if station_params[self.cod]['Format'] == 'old':
+            skip_header, usecols, scale, delimiter = 4, [1,2,3], 4280, '	'
+
+        channels = station_params[self.cod]['Channels']
         self.names = self._ls(dirName)
         
         for i in range(len(self.names)):
-            wave = np.genfromtxt(fname=dirName + '/' + self.names[i] + self.extension, delimiter=',', usecols=[2,3,4], names=channels, skip_header=4) #FIC-UNI
+            wave = np.genfromtxt(fname=dirName + '/' + self.names[i] + self.extension, delimiter=delimiter, usecols=usecols, names=channels, skip_header=skip_header)
             n = wave.shape[0]
-            file = open(dirName + '/' + self.names[i] + self.extension, 'r')
-            file.readline()
-            file.readline()
-            file.readline()
-            file.readline()
-            line = file.readline().split(',')
-            date = '20' + line[0].replace('/', '-').split(',')[0]
-            hour = line[1]
-            start_time = UTCDateTime(date + 'T' + hour)
+            start_time = UTCDateTime()
             st = Stream(traces=[Trace(wave[channels[0]]/scale), Trace(wave[channels[1]]/scale), Trace(wave[channels[2]]/scale)])
 
             for j in range(3):
                 st[j].stats.network = self.names[i]
-                st[j].stats.station = 'FIC-UNI'
+                st[j].stats.station = station_params[self.cod]['Id']
                 st[j].stats._format = None,
                 st[j].stats.channel = channels[j]
                 st[j].stats.starttime = start_time
@@ -369,29 +397,7 @@ class Waves:
                 st[j].stats.npts = n 
             self.itk.append(st)
 
-    def loadWaves_new(self, dirName):
-        channels = ["N_S", "E_W", "U_D"] # FIC-UNI
-        self.names = self._ls(dirName)
-        
-        for i in range(len(self.names)):
-            wave = np.genfromtxt(fname=dirName + '/' + self.names[i] + self.extension, delimiter=',', usecols=[2,3,4], names=channels, skip_header=0) # CCIFIC
-            n = wave.shape[0]
-            line = open(dirName + '/' + self.names[i] + self.extension, 'r').readline().split(',') # CCIFIC
-            date = line[0].replace('/', '-').split(',')[0]
-            hour = line[1].split(':') # CCIFIC
-            hour = ':'.join(hour[0:3]) + '.' + hour[-1] #CCIFIC
-            start_time = UTCDateTime(date + 'T' + hour)
-            st = Stream(traces=[Trace(wave[channels[0]]), Trace(wave[channels[1]]), Trace(wave[channels[2]])])
-
-            for j in range(3):
-                st[j].stats.network = self.names[i]
-                st[j].stats.station = 'CIIFIC'
-                st[j].stats._format = None
-                st[j].stats.channel = channels[j]
-                st[j].stats.starttime = start_time
-                st[j].stats.sampling_rate = 100.0
-                st[j].stats.npts = n 
-            self.itk.append(st)
+        print("Station {0} - {1} Loaded".format(self.cod, station_params[self.cod]['Id']))
 
     def passBandButterWorth(self, low_freq=1.0, high_freq=25.0, order=4):
         for itk in self.itk:
@@ -444,18 +450,50 @@ class Waves:
                 d[j].stats.npts = len(self.itk[i][j].data)
             self.itk_d.append(d)
 
+    def get_PGA(self):
+        self.PGAs = []
+        for i in range(3):
+            mini = np.min(self.itk[0][i].data)
+            maxi = np.max(self.itk[0][i].data)
+            pga = mini if abs(mini) > abs(maxi) else maxi
+            self.PGAs.append(pga)
+
+        return copy(self.PGAs)
+ 
+
 if __name__ == '__main__':
+    import datetime
 
     event = Event()
-    event.load_event('D:/SHM/code-jj/Events/2020-0675.txt')
-    event.load_stations('D:/SHM/code-jj/Stations')
-    # event.save_event_properties('D:/SHM/code-jj/Report')
+    event.load_event('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0675.txt')
     # event.createMap01(dpi=100)
     # event.createMap02(dpi=100)
-    
 
-    # CIIFIC = Waves()
-    # CIIFIC.loadWaves_new('D:/SHM/code-jj/15-01-2020')
+    stations = [Station(), Station(), Station()]
+    stations[0].loadStation('D:/SHM/code-jj/Events/2020-08-14_18-23-10/006')
+    stations[1].loadStation('D:/SHM/code-jj/Events/2020-08-14_18-23-10/002')
+    stations[2].loadStation('D:/SHM/code-jj/Events/2020-08-14_18-23-10/001')
+
+    for station in stations:
+        station.baseLine(type='spline',order=2,dspline=1000)  
+        station.passBandButterWorth(low_freq=1.0, high_freq=25.0, order=10)
+        event.add_station(station)
+        for itk in station.itk:
+            itk.plot()
+
+    event.get_max_station()
+    event.save_event_properties('D:/SHM/code-jj/Report')
+
+    # print(event.epicenter)
+    # print(event.station)
+
+    # print(event.station)
+
+    # CIIFIC.itk[0].plot()
+    # FIC.itk[0].plot()
+    # PAB.itk[0].plot()
+    
+    # event.add_station('D:/SHM/code-jj/Stations')
     # CIIFIC.loadWaves_old('D:/SHM/code-jj/2020-11-02_2020-11-02')
 
     # CIIFIC.baseLine('spline', 1, 100)

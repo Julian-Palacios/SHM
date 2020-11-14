@@ -1,92 +1,86 @@
 =>PYTHONTEX#py#default#default#0#code#####75#
 from Python_tools.core import Event
+import pandas as pd
 
 event = Event.load_event_properties('D:/SHM/code-jj/Report/Event_properties.sav')
 
-lugar = event.epicenter["Place"][0]
-fecha = event.epicenter["Date"][0]
-hora_local = event.epicenter["Local Hour"][0]
-hora_UTC = event.epicenter["UTC Hour"][0]
-referencia = event.epicenter["Venue"][0]
-institucion = event.epicenter["Institution"][0]
-latitud = event.epicenter["Latitude"][0]
-longitud = event.epicenter["Longitude"][0]
-profundidad = event.epicenter["Depth"][0]
-magnitud = event.epicenter["Magnitude"][0]
-nstations = len(event.station)
+lugar = event.epicenter["Place"].iloc[0]
+fecha = event.epicenter["Date"].iloc[0]
+hora_local = event.epicenter["Local Hour"].iloc[0]
+hora_UTC = event.epicenter["UTC Hour"].iloc[0]
+referencia = event.epicenter["Venue"].iloc[0]
+institucion = event.epicenter["Institution"].iloc[0]
+latitud = event.epicenter["Latitude"].iloc[0]
+longitud = event.epicenter["Longitude"].iloc[0]
+profundidad =  event.epicenter["Depth"].iloc[0]
+magnitud = event.epicenter["Magnitude"].iloc[0]
+nstations = str(len(event.station)).zfill(2)
 
-=>PYTHONTEX#py#default#default#1#i#####103#
+=>PYTHONTEX#py#default#default#1#i#####104#
 lugar
-=>PYTHONTEX#py#default#default#2#i#####103#
+=>PYTHONTEX#py#default#default#2#i#####104#
 fecha
-=>PYTHONTEX#py#default#default#3#i#####107#
+=>PYTHONTEX#py#default#default#3#i#####108#
 fecha
-=>PYTHONTEX#py#default#default#4#i#####107#
+=>PYTHONTEX#py#default#default#4#i#####108#
 hora_local
-=>PYTHONTEX#py#default#default#5#i#####107#
+=>PYTHONTEX#py#default#default#5#i#####108#
 referencia
-=>PYTHONTEX#py#default#default#6#i#####107#
+=>PYTHONTEX#py#default#default#6#i#####108#
 institucion
-=>PYTHONTEX#py#default#default#7#i#####116#
+=>PYTHONTEX#py#default#default#7#i#####117#
 institucion
-=>PYTHONTEX#py#default#default#8#i#####116#
+=>PYTHONTEX#py#default#default#8#i#####117#
 institucion
-=>PYTHONTEX#py#default#default#9#i#####128#
+=>PYTHONTEX#py#default#default#9#i#####129#
 hora_local
-=>PYTHONTEX#py#default#default#10#i#####128#
+=>PYTHONTEX#py#default#default#10#i#####129#
 hora_UTC
-=>PYTHONTEX#py#default#default#11#i#####128#
+=>PYTHONTEX#py#default#default#11#i#####129#
 latitud
-=>PYTHONTEX#py#default#default#12#i#####128#
+=>PYTHONTEX#py#default#default#12#i#####129#
 longitud
-=>PYTHONTEX#py#default#default#13#i#####128#
+=>PYTHONTEX#py#default#default#13#i#####129#
 profundidad
-=>PYTHONTEX#py#default#default#14#i#####128#
+=>PYTHONTEX#py#default#default#14#i#####129#
 magnitud
-=>PYTHONTEX#py#default#default#15#i#####128#
+=>PYTHONTEX#py#default#default#15#i#####129#
 referencia
-=>PYTHONTEX#py#default#default#16#i#####128#
+=>PYTHONTEX#py#default#default#16#i#####129#
 hora_local
-=>PYTHONTEX#py#default#default#17#i#####128#
+=>PYTHONTEX#py#default#default#17#i#####129#
 hora_UTC
-=>PYTHONTEX#py#default#default#18#i#####128#
+=>PYTHONTEX#py#default#default#18#i#####129#
 latitud
-=>PYTHONTEX#py#default#default#19#i#####128#
+=>PYTHONTEX#py#default#default#19#i#####129#
 longitud
-=>PYTHONTEX#py#default#default#20#i#####128#
+=>PYTHONTEX#py#default#default#20#i#####129#
 profundidad
-=>PYTHONTEX#py#default#default#21#i#####128#
+=>PYTHONTEX#py#default#default#21#i#####129#
 magnitud
-=>PYTHONTEX#py#default#default#22#i#####128#
+=>PYTHONTEX#py#default#default#22#i#####129#
 referencia
-=>PYTHONTEX#py#default#default#23#i#####149#
+=>PYTHONTEX#py#default#default#23#i#####151#
 nstations
-=>PYTHONTEX#py#default#default#24#code#####153#
-import pandas as pd
-
-PGA_max = 3.55
-direccion = 'NS'
-stationmax = 'FIC-UNI'
-stationmaxubic = 'FIC-UNI, Rímac, Lima'
+=>PYTHONTEX#py#default#default#24#code#####154#
+pga_max = round(event.max_station["Max_pga"].iloc[0], 2)
+direccion = event.max_station["Channel_max_pga"].iloc[0]
+stationmax = event.max_station["Id"].iloc[0]
+stationmaxubic = event.max_station["Location"].iloc[0]
 
 cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora_local)
 
-station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605],
-                        'Longitude': [-77.0191, -77.0172, -76.9759],
-                        'Name': ['CIIFIC', 'FIC-UNI', 'CISMID'],
-                        'Location':['CIIFIC-FIC-UNI, Rímac, Lima', 'FIC-UNI, Rímac, Lima', 'CISMID-FIC-UNI, Rímac, Lima'],
-                        'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
-                        })
-
-=>PYTHONTEX#py#default#default#25#i#####174#
-PGA_max
-=>PYTHONTEX#py#default#default#26#i#####174#
+=>PYTHONTEX#py#default#default#25#i#####166#
+pga_max
+=>PYTHONTEX#py#default#default#26#i#####166#
 direccion
-=>PYTHONTEX#py#default#default#27#i#####175#
+=>PYTHONTEX#py#default#default#27#i#####167#
 stationmax
-=>PYTHONTEX#py#default#default#28#i#####175#
+=>PYTHONTEX#py#default#default#28#i#####167#
 stationmaxubic
-=>PYTHONTEX#py#default#default#29#code#####179#
+=>PYTHONTEX#py#default#default#29#i#####169#
+nstations
+=>PYTHONTEX#py#default#default#30#code#####171#
 
 print(r"\renewcommand{\arraystretch}{1.2}")
 print(r"\begin{longtable}{|c|c|c|c|}")
@@ -102,10 +96,10 @@ print(r"\endhead")
 print(r"\endfoot")
 print(r"\endlastfoot")
 
-for i in range(len(station)):
-    print(r"\multirow{3}{*}{%s}"%(station["Name"][i]),r" & EW & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} %s\end{tabulary}}"%(station["Location"][i]),r" & %.2f \\ \cline{2-2} \cline{4-4}"%(station["PGA"][i][0]))
-    print(r" & NS &  & %.2f \\ \cline{2-2} \cline{4-4}"%(station["PGA"][i][1]))
-    print(r" & UD &  & %.2f \\ \hline"%(station["PGA"][i][2]))
+for i in range(len(event.station)):
+    print(r"\multirow{3}{*}{%s}"%(event.station["Id"].iloc[i]),r" & %s & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} %s\end{tabulary}}"%(event.station["Channels"].iloc[i][0], event.station["Location"].iloc[i]),r" & %.2f \\ \cline{2-2} \cline{4-4}"%(event.station["PGAs"].iloc[i][0]))
+    print(r" & %s &  & %.2f \\ \cline{2-2} \cline{4-4}"%(event.station["Channels"].iloc[i][1], event.station["PGAs"].iloc[i][1]))
+    print(r" & %s &  & %.2f \\ \hline"%(event.station["Channels"].iloc[i][2], event.station["PGAs"].iloc[i][2]))
     if (i+1) == 9 or (i-8) % 11 == 0:
         print(r"\pagebreak")
 print(r"\end{longtable}")

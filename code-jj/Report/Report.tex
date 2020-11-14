@@ -74,20 +74,21 @@ SÍSMICAS Y MITIGACIÓN DE DESASTRES\\
 
 \begin{pycode}
 from Python_tools.core import Event
+import pandas as pd
 
 event = Event.load_event_properties('D:/SHM/code-jj/Report/Event_properties.sav')
 
-lugar = event.epicenter["Place"][0]
-fecha = event.epicenter["Date"][0]
-hora_local = event.epicenter["Local Hour"][0]
-hora_UTC = event.epicenter["UTC Hour"][0]
-referencia = event.epicenter["Venue"][0]
-institucion = event.epicenter["Institution"][0]
-latitud = event.epicenter["Latitude"][0]
-longitud = event.epicenter["Longitude"][0]
-profundidad = event.epicenter["Depth"][0]
-magnitud = event.epicenter["Magnitude"][0]
-nstations = len(event.station)
+lugar = event.epicenter["Place"].iloc[0]
+fecha = event.epicenter["Date"].iloc[0]
+hora_local = event.epicenter["Local Hour"].iloc[0]
+hora_UTC = event.epicenter["UTC Hour"].iloc[0]
+referencia = event.epicenter["Venue"].iloc[0]
+institucion = event.epicenter["Institution"].iloc[0]
+latitud = event.epicenter["Latitude"].iloc[0]
+longitud = event.epicenter["Longitude"].iloc[0]
+profundidad =  event.epicenter["Depth"].iloc[0]
+magnitud = event.epicenter["Magnitude"].iloc[0]
+nstations = str(len(event.station)).zfill(2)
 
 \end{pycode}
 
@@ -145,36 +146,27 @@ acelerográficas más cercanas, se muestra en la Figura (\ref{tab:tab01}). \\
 \vspace{1cm}
 
 \noindent
-En este reporte, la Red de Monitoreo de Edificaciones del CISMID-FIC-UNI (REMOED) presenta de manera
-preliminar, los registros sísmicos obtenidos de este evento correspondiente a \py{nstations} estaciones 
-acelerográficas ubicadas en la ciudad de Lima, cuyos valores de aceleración máxima, para cada 
+En este reporte, la Red de Monitoreo de Edificaciones (REMOED) del Centro Peruano Japonés de Investigaciones Sísmicas y Mitigación
+de Desastres (CISMID) FIC-UNI presenta de manera preliminar, los registros sísmicos obtenidos de este evento correspondiente a 
+\py{nstations} estaciones acelerográficas ubicadas en la ciudad de Lima, cuyos valores de aceleración máxima, para cada 
 componente, y localizaciónes se muestran en la Tabla (\ref{tab:tab02}) y Figura (\ref{fig:fig02}) respectivamente.\\
 
 \begin{pycode}
-import pandas as pd
-
-PGA_max = 3.55
-direccion = 'NS'
-stationmax = 'FIC-UNI'
-stationmaxubic = 'FIC-UNI, Rímac, Lima'
+pga_max = round(event.max_station["Max_pga"].iloc[0], 2)
+direccion = event.max_station["Channel_max_pga"].iloc[0]
+stationmax = event.max_station["Id"].iloc[0]
+stationmaxubic = event.max_station["Location"].iloc[0]
 
 cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora_local)
-
-station = pd.DataFrame({'Latitude': [-12.1740, -12.0976, -12.0605], 
-                        'Longitude': [-77.0191, -77.0172, -76.9759], 
-                        'Name': ['CIIFIC', 'FIC-UNI', 'CISMID'], 
-                        'Location':['CIIFIC-FIC-UNI, Rímac, Lima', 'FIC-UNI, Rímac, Lima', 'CISMID-FIC-UNI, Rímac, Lima'],
-                        'PGA':[[3.54, 3.55, 1.52], [-1.04, -1.00, -0.76], [-1.19, 1.43, -1.07]]
-                        })
 
 \end{pycode}
 
 \newpage
 \noindent
-El máximo valor de PGA registrado en estas estaciones es de \py{PGA_max} cm/s2 en la dirección \py{direccion} 
+El máximo valor de PGA registrado en estas estaciones es de \py{pga_max} cm/s2 en la dirección \py{direccion} 
 correspondiente a la estación \py{stationmax} (\py{stationmaxubic}).
 Finalmente, en el Anexo adjunto se presentan las gráficas de los acelerogramas obtenidos 
-en las trece estaciones (direcciones EW, NS y vertical).
+en las \py{nstations} estaciones (direcciones EW, NS y vertical).
 
 \begin{pycode}
 
@@ -192,10 +184,10 @@ print(r"\endhead")
 print(r"\endfoot")
 print(r"\endlastfoot")
 
-for i in range(len(station)):
-    print(r"\multirow{3}{*}{%s}"%(station["Name"][i]),r" & EW & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} %s\end{tabulary}}"%(station["Location"][i]),r" & %.2f \\ \cline{2-2} \cline{4-4}"%(station["PGA"][i][0]))
-    print(r" & NS &  & %.2f \\ \cline{2-2} \cline{4-4}"%(station["PGA"][i][1]))
-    print(r" & UD &  & %.2f \\ \hline"%(station["PGA"][i][2]))
+for i in range(len(event.station)):
+    print(r"\multirow{3}{*}{%s}"%(event.station["Id"].iloc[i]),r" & %s & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} %s\end{tabulary}}"%(event.station["Channels"].iloc[i][0], event.station["Location"].iloc[i]),r" & %.2f \\ \cline{2-2} \cline{4-4}"%(event.station["PGAs"].iloc[i][0]))
+    print(r" & %s &  & %.2f \\ \cline{2-2} \cline{4-4}"%(event.station["Channels"].iloc[i][1], event.station["PGAs"].iloc[i][1]))
+    print(r" & %s &  & %.2f \\ \hline"%(event.station["Channels"].iloc[i][2], event.station["PGAs"].iloc[i][2]))
     if (i+1) == 9 or (i-8) % 11 == 0:
         print(r"\pagebreak")
 print(r"\end{longtable}")
