@@ -9,7 +9,7 @@
             pdfproducer={TeXLive},
             pdfcreator={pdflatex, or other tool},
             colorlinks=true,
-            linkcolor=blue]{hyperref}
+            linkcolor=black]{hyperref}
 
 
 %---------------------------------------------------------------%
@@ -23,8 +23,9 @@
 scale=1,
 angle=0,
 color=Cyan,
-opacity=1,
-contents={
+opacity=0.15,
+contents={ %\transparent{0.4}
+\includegraphics[width=100mm]{Logos/logo_cismid.png}  
 \begin{tikzpicture}[overlay,remember picture]
 \draw [line width=1.5pt]
     ($ (current page.north west) + (1.0cm,-1.0cm) $) % izquierda, arriba
@@ -71,6 +72,13 @@ SÍSMICAS Y MITIGACIÓN DE DESASTRES\\
 %%%%%
 %-------------------CUERPO-------------------%
 \begin{document}
+
+% \listoffigures
+
+% \listoftables
+
+% \newpage
+
 
 \begin{pycode}
 from Python_tools.core import Event
@@ -205,7 +213,47 @@ print(r"\newpage")
             \setlength\fboxrule{0.3pt}
             \fbox{\includegraphics[trim={1mm 1mm 1mm 1mm},clip,width=\textwidth]{Mapa02.png}}
     
-    \end{figure}
+\end{figure}
+
+\clearpage
+
+
+
+\vspace*{\fill}% * is needed here
+\noindent
+\raisebox{0.5cm}{
+\makebox[\textwidth]{\hfill {\fontsize{30}{10}\selectfont ANEXO \\ \\ \\ }\hfill }
+}
+\raisebox{-0.5cm}{
+\makebox[\textwidth]{\\ \\ \hfill {\fontsize{24}{20}\selectfont REGISTROS TIEMPO HISTORIA \\  } \hfill }
+}
+\vfill
+
+\clearpage
     
+\begin{pycode}
+
+for i in range(event.station.shape[0]):
+    channel = event.station.iloc[i]["Channels"]
+    fig = event.station.iloc[i]["Graf Acc_Four"]
+    for j in range(3):
+        capth = 'Registro de Acerelaciones y Espectros de Fourier de la estación %s en dirección %s.' %(event.station["Id"].iloc[i], channel[j])
+        print(r'\begin{figure}[!ht]')
+        print(r"\caption{%s}"%capth)
+        print(r"\label{fig: figura_%s}" %fig[j].split('.')[0])
+        print(r"\centering")
+        print(r"\includegraphics{%s}"%fig[j].split('.')[0])
+        print(r"\end{figure}")
+        print(r'\newpage')
+print(r"\clearpage")
+\end{pycode}
+\newpage
+
+\listoffigures
+
+\listoftables
+
+\newpage
+
 \end{document}
 

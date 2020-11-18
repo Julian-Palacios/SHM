@@ -1,0 +1,74 @@
+from Python_tools.core import Event, Station
+import os 
+# step 1) Leer el evento del IGP y crear el objeto de la clase Event.
+event = Event()
+event.load_event('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0675.txt')
+
+# step 2) leer la carpeta donde se encuentras los registros de las estaciones.
+path_event = 'D:/SHM/code-jj/Events/%s' %event.event_waves_dir
+with os.scandir(path_event) as f:
+    s = [f.name for f in f if f.is_dir()]
+
+# step 3) Cargar los datos de las estaciones creando los objetos de la clase Station.
+stations = [Station(path_event + '/%s' %i) for i in s]
+
+# step 4) Hacer los filtros Línea Base, Pasa Banda además de los calculos de los espectros de Fourier y de Respuesta.
+for station in stations:
+    station.baseLine(type='spline',order=2,dspline=1000)  
+    station.passBandButterWorth(low_freq=1.0, high_freq=20.0, order=10)
+    station.get_fourier()
+    station.get_sa_sd()
+
+    # step 5) Agregar las estaciones creadas al objeto Event.
+    event.add_station(station)
+
+    # step 6) Creas las graficas de Aceleracion-Espectros de Fourier y de Respuesta.
+    event.create_acc_fourier_graf(station, dpi=300, transparent=True, smooth_grade=25)
+    event.create_sa_sd_graf(station)
+
+# step 7) Crear los mapas.
+event.createMap01(dpi=300)
+event.createMap02(dpi=300)
+
+# strp 8) Obtener la estación cuyo PGA es máximo (Esencial para la generación del reporte).
+event.get_max_station()
+
+# step 9) Guardar las propiedades del Evento (Esencial para la generación del reporte).
+event.save_event_properties('D:/SHM/code-jj/Report')
+
+print("Done")
+
+
+    
+
+
+
+# stations = [Station(), Station(), Station()]
+# stations[0].loadStation('D:/SHM/code-jj/Events/2020-08-14_18-23-10/006')
+# stations[1].loadStation('D:/SHM/code-jj/Events/2020-08-14_18-23-10/002')
+# stations[2].loadStation('D:/SHM/code-jj/Events/2020-08-14_18-23-10/001')
+
+# for station in stations:
+#     station.baseLine(type='spline',order=2,dspline=1000)  
+#     station.passBandButterWorth(low_freq=1.0, high_freq=20.0, order=10)
+#     station.get_fourier()
+#     event.add_station(station)
+#     # for i in range(len(station.acc)):
+#     #     station.acc[i].plot()
+#     #     station.fourier[i].plot()
+#     #     # acc[0]["Fourier"] = [1,4,5,8,6]
+#     #     print(acc[0])
+
+# event.createMap01(dpi=50)
+# event.createMap02(dpi=50)
+
+# # print(event.station)
+# # stations[0].acc[0].plot()
+# event.create_time_history_graf(stations[0])
+# event.create_time_history_graf(stations[1])
+# event.create_time_history_graf(stations[2])
+
+# event.get_max_station()
+# # print(event.station)
+
+# event.save_event_properties('D:/SHM/code-jj/Report')

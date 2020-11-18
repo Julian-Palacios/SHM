@@ -1,4 +1,4 @@
-=>PYTHONTEX#py#default#default#0#code#####75#
+=>PYTHONTEX#py#default#default#0#code#####83#
 from Python_tools.core import Event
 import pandas as pd
 
@@ -16,53 +16,53 @@ profundidad =  event.epicenter["Depth"].iloc[0]
 magnitud = event.epicenter["Magnitude"].iloc[0]
 nstations = str(len(event.station)).zfill(2)
 
-=>PYTHONTEX#py#default#default#1#i#####104#
+=>PYTHONTEX#py#default#default#1#i#####112#
 lugar
-=>PYTHONTEX#py#default#default#2#i#####104#
+=>PYTHONTEX#py#default#default#2#i#####112#
 fecha
-=>PYTHONTEX#py#default#default#3#i#####108#
+=>PYTHONTEX#py#default#default#3#i#####116#
 fecha
-=>PYTHONTEX#py#default#default#4#i#####108#
+=>PYTHONTEX#py#default#default#4#i#####116#
 hora_local
-=>PYTHONTEX#py#default#default#5#i#####108#
+=>PYTHONTEX#py#default#default#5#i#####116#
 referencia
-=>PYTHONTEX#py#default#default#6#i#####108#
+=>PYTHONTEX#py#default#default#6#i#####116#
 institucion
-=>PYTHONTEX#py#default#default#7#i#####117#
+=>PYTHONTEX#py#default#default#7#i#####125#
 institucion
-=>PYTHONTEX#py#default#default#8#i#####117#
+=>PYTHONTEX#py#default#default#8#i#####125#
 institucion
-=>PYTHONTEX#py#default#default#9#i#####129#
+=>PYTHONTEX#py#default#default#9#i#####137#
 hora_local
-=>PYTHONTEX#py#default#default#10#i#####129#
+=>PYTHONTEX#py#default#default#10#i#####137#
 hora_UTC
-=>PYTHONTEX#py#default#default#11#i#####129#
+=>PYTHONTEX#py#default#default#11#i#####137#
 latitud
-=>PYTHONTEX#py#default#default#12#i#####129#
+=>PYTHONTEX#py#default#default#12#i#####137#
 longitud
-=>PYTHONTEX#py#default#default#13#i#####129#
+=>PYTHONTEX#py#default#default#13#i#####137#
 profundidad
-=>PYTHONTEX#py#default#default#14#i#####129#
+=>PYTHONTEX#py#default#default#14#i#####137#
 magnitud
-=>PYTHONTEX#py#default#default#15#i#####129#
+=>PYTHONTEX#py#default#default#15#i#####137#
 referencia
-=>PYTHONTEX#py#default#default#16#i#####129#
+=>PYTHONTEX#py#default#default#16#i#####137#
 hora_local
-=>PYTHONTEX#py#default#default#17#i#####129#
+=>PYTHONTEX#py#default#default#17#i#####137#
 hora_UTC
-=>PYTHONTEX#py#default#default#18#i#####129#
+=>PYTHONTEX#py#default#default#18#i#####137#
 latitud
-=>PYTHONTEX#py#default#default#19#i#####129#
+=>PYTHONTEX#py#default#default#19#i#####137#
 longitud
-=>PYTHONTEX#py#default#default#20#i#####129#
+=>PYTHONTEX#py#default#default#20#i#####137#
 profundidad
-=>PYTHONTEX#py#default#default#21#i#####129#
+=>PYTHONTEX#py#default#default#21#i#####137#
 magnitud
-=>PYTHONTEX#py#default#default#22#i#####129#
+=>PYTHONTEX#py#default#default#22#i#####137#
 referencia
-=>PYTHONTEX#py#default#default#23#i#####151#
+=>PYTHONTEX#py#default#default#23#i#####159#
 nstations
-=>PYTHONTEX#py#default#default#24#code#####154#
+=>PYTHONTEX#py#default#default#24#code#####162#
 pga_max = round(event.max_station["Max_pga"].iloc[0], 2)
 direccion = event.max_station["Channel_max_pga"].iloc[0]
 stationmax = event.max_station["Id"].iloc[0]
@@ -70,17 +70,17 @@ stationmaxubic = event.max_station["Location"].iloc[0]
 
 cap_fig2 = "Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de {0} del {1} a las {2} (hora local)".format(lugar, fecha, hora_local)
 
-=>PYTHONTEX#py#default#default#25#i#####166#
+=>PYTHONTEX#py#default#default#25#i#####174#
 pga_max
-=>PYTHONTEX#py#default#default#26#i#####166#
+=>PYTHONTEX#py#default#default#26#i#####174#
 direccion
-=>PYTHONTEX#py#default#default#27#i#####167#
+=>PYTHONTEX#py#default#default#27#i#####175#
 stationmax
-=>PYTHONTEX#py#default#default#28#i#####167#
+=>PYTHONTEX#py#default#default#28#i#####175#
 stationmaxubic
-=>PYTHONTEX#py#default#default#29#i#####169#
+=>PYTHONTEX#py#default#default#29#i#####177#
 nstations
-=>PYTHONTEX#py#default#default#30#code#####171#
+=>PYTHONTEX#py#default#default#30#code#####179#
 
 print(r"\renewcommand{\arraystretch}{1.2}")
 print(r"\begin{longtable}{|c|c|c|c|}")
@@ -106,6 +106,23 @@ print(r"\end{longtable}")
 
 print(r"\newpage")
 
+=>PYTHONTEX#py#default#default#31#code#####234#
+
+for i in range(event.station.shape[0]):
+    channel = event.station.iloc[i]["Channels"]
+    fig = event.station.iloc[i]["Graf Acc_Four"]
+    for j in range(3):
+        capth = 'Registro de Acerelaciones y Espectros de Fourier de la estación %s en dirección %s.' %(event.station["Id"].iloc[i], channel[j])
+        print(r'\begin{figure}[!ht]')
+        print(r"\caption{%s}"%capth)
+        print(r"\label{fig: figura_%s}" %fig[j].split('.')[0])
+        print(r"\centering")
+        print(r"\includegraphics{%s}"%fig[j].split('.')[0])
+        print(r"\end{figure}")
+        print(r'\newpage')
+print(r"\clearpage")
+=>PYTHONTEX#py#default#default#32#i#####2#
+institucion
 =>PYTHONTEX:SETTINGS#
 version=0.17
 outputdir=pythontex-files-Report
