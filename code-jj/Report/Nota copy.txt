@@ -1,0 +1,7 @@
+cd /d/SHM/code-jj/Report; pdflatex Report.tex
+cd /d/SHM/env/Scripts; pythontex --interpreter "python:py" ../../code-jj/Report/Report.tex
+
+cd /d/SHM/code-jj/Report; pdflatex Report.tex
+cd /d/SHM/env/Scripts; pythontex --interpreter "python:py" ../../code-jj/Report/Report.tex
+
+cd /d/SHM/code-jj/Report; pdflatex Report.tex

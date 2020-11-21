@@ -1,7 +1,91 @@
 \documentclass[11pt, a4paper]{report}
 %--------------Importación de paquetes (preámbulo)--------------%
-\input{preambulo}
-\usepackage[pdftex,
+%--------------Elección del idioma español--------------%
+\usepackage[spanish,es-noshorthands, es-tabla]{babel}
+%--------------------------------------------------------------%
+%-Elección de codificación y caracteres especiales-%
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{anyfontsize}
+\usepackage{t1enc}
+%--------------------------------------
+\usepackage{lmodern}
+%Caracteristicas matematicas: simbolos, caracteres, etc%
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{indentfirst}
+\usepackage{anysize}
+
+%-----Caracteristicas para el manejo de graficos-----%
+%\usepackage{graphics}%
+\usepackage{graphicx}
+\usepackage{transparent}
+\usepackage{eso-pic}
+%\usepackage[lofdepth,lotdepth]{subfig}
+\usepackage{float}
+\usepackage{pgf,tikz,pgfplots,mathrsfs}
+\usepackage{pstricks-add}
+\usetikzlibrary{calc}
+\usetikzlibrary{babel}
+\usepackage{tikzpagenodes}
+\usepackage{lipsum}
+\usepackage[font=small,labelfont=bf]{caption}
+%\usetikzlibrary{arrows,patterns}
+\pgfplotsset{compat=1.15}
+
+\usepackage{pst-node}
+\usepackage{pst-plot}
+\usepackage{psfrag}
+%__Manejo de múltiples columnas
+\usepackage{multicol}
+%__Manejo de entrelineado
+\usepackage{setspace}
+%__Manejo de color
+\usepackage{color}
+\usepackage{xcolor}
+%__Manejo de tablas
+\usepackage{colortbl}
+\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{tabulary}
+\usepackage{bigstrut}
+\usepackage{longtable,lscape}
+\usepackage{array}
+%__Manejo de índice
+\usepackage{makeidx}
+%__Manejo de cabecera y pies de pagina
+\usepackage{fancyhdr}
+%__Manejo de la enumeración
+\usepackage{enumitem}
+
+%---------------Otros paquetes---------------%
+\usepackage{pdflscape}
+\usepackage{subfigure}
+\usepackage{enumerate}
+\usepackage{textcomp}
+\usepackage{afterpage}
+\usepackage{background}
+%------------ Paquetes Para codigo-----------%
+\usepackage{verbatim}
+\usepackage{moreverb}
+\usepackage{fancybox}
+\usepackage{pythontex}
+%--------------------------------------------------------------%
+%Autor%
+\author{CISMID\\Kevin Steve Huerta Gonzales}
+%%%%%%%  Comandos Personalizados %%%%%%
+\newcommand{\multlinecomment}[1]{\directlua{-- #1}}
+%%%%%%---%%% algunas configuraciones por implementar
+\captionsetup{%
+  font={small}, % small font size
+  labelfont={bf,sf},      % label in bold, sans-serif
+  singlelinecheck=true, % centered single-lined captions
+  format=hang,             % indention=1cm ---> plain
+  labelsep={colon},         % default separator: none, colon, period, space, quad, newline, endash
+}
+\usepackage[
+            pdftex,
             pdfauthor={Joseph Jaramillo},
             pdftitle={Informe reporte sísmico},
             pdfsubject={UTN},
@@ -10,8 +94,6 @@
             pdfcreator={pdflatex, or other tool},
             colorlinks=true,
             linkcolor=black]{hyperref}
-
-
 %---------------------------------------------------------------%
 \graphicspath{ {Figures/} }
 \setlength{\parindent}{0em}
@@ -25,17 +107,7 @@ angle=0,
 color=Cyan,
 opacity=0.15,
 contents={ %\transparent{0.4}
-\includegraphics[width=100mm]{Logos/logo_cismid.png}  
-\begin{tikzpicture}[overlay,remember picture]
-\draw [line width=1.5pt]
-    ($ (current page.north west) + (1.0cm,-1.0cm) $) % izquierda, arriba
-    rectangle
-    ($ (current page.south east) + (-1.0cm,0.8 cm) $);  % derecha,abajo
-\draw [line width=1.25pt]
-    ($ (current page.north west) + (1.15cm,-1.15cm) $)
-    rectangle
-    ($ (current page.south east) + (-1.15cm,0.95cm) $); 
-\end{tikzpicture}
+\includegraphics[width=100mm]{Logos/logo_cismid.png}
 }
 }
 
@@ -66,7 +138,6 @@ SÍSMICAS Y MITIGACIÓN DE DESASTRES\\
 		Teléfono (511)482-0777, (511)482-0804, (511)482-0790   Fax: (511)481-0170 \\
 		e-mail: director@uni.edu.pe   http://www.cismid.uni.edu.pe
 		}
-
 \pagestyle{fancy}
 
 %%%%%
@@ -84,7 +155,7 @@ SÍSMICAS Y MITIGACIÓN DE DESASTRES\\
 from Python_tools.core import Event
 import pandas as pd
 
-event = Event.load_event_properties('D:/SHM/code-jj/Report/Event_properties.sav')
+event = Event.load_event_properties('D:/SHM/code-jj/Report/Event.sav')
 
 lugar = event.epicenter["Place"].iloc[0]
 fecha = event.epicenter["Date"].iloc[0]
@@ -103,10 +174,10 @@ nstations = str(len(event.station)).zfill(2)
 \begin{center}
 \centering 
 \textbf{CENTRO DE MONITOREO SÍSMICO DEL CISMID-FIC-UNI \\
-RED DE MONITOREO DE EDIFICACIONES}
+RED DE MONITOREO DE EDIFICACIONES\\}
 \vspace{0.3cm}
 
-\textbf{INFORME PRELIMINAR}
+\textbf{INFORME PRELIMINAR\\}
 \vspace{0.3cm}
 
 \textbf{Acelerogramas del Sismo de \py{lugar} del \py{fecha}}
@@ -114,8 +185,8 @@ RED DE MONITOREO DE EDIFICACIONES}
 \end{center}
 
 El \py{fecha} a las \py{hora_local} (hora local), ocurrió un sismo con epicentro a \py{referencia} (Fuente: \py{institucion}). Las características sísmicas del evento 
-se resumen en la Tabla (\ref{tab:tab01}) y la ubicación del epicentro, así como de las estaciones 
-acelerográficas más cercanas, se muestra en la Figura (\ref{tab:tab01}). \\
+se resumen en la \textbf{Tabla (\ref{tab:tab01})} y la ubicación del epicentro, así como de las estaciones 
+acelerográficas más cercanas, se muestra en la \textbf{Figura (\ref{tab:tab01})}. \\
 
 \begin{figure}[H]
     \begin{multicols}{2}
@@ -157,7 +228,7 @@ acelerográficas más cercanas, se muestra en la Figura (\ref{tab:tab01}). \\
 En este reporte, la Red de Monitoreo de Edificaciones (REMOED) del Centro Peruano Japonés de Investigaciones Sísmicas y Mitigación
 de Desastres (CISMID) FIC-UNI presenta de manera preliminar, los registros sísmicos obtenidos de este evento correspondiente a 
 \py{nstations} estaciones acelerográficas ubicadas en la ciudad de Lima, cuyos valores de aceleración máxima, para cada 
-componente, y localizaciónes se muestran en la Tabla (\ref{tab:tab02}) y Figura (\ref{fig:fig02}) respectivamente.\\
+componente, y localizaciónes se muestran en la \textbf{Tabla (\ref{tab:tab02})} y \textbf{Figura (\ref{fig:fig02})} respectivamente.\\
 
 \begin{pycode}
 pga_max = round(event.max_station["Max_pga"].iloc[0], 2)
@@ -212,8 +283,15 @@ print(r"\newpage")
             \setlength\fboxsep{0pt}
             \setlength\fboxrule{0.3pt}
             \fbox{\includegraphics[trim={1mm 1mm 1mm 1mm},clip,width=\textwidth]{Mapa02.png}}
-    
 \end{figure}
+
+\vspace{1cm}
+
+\noindent
+A continuación, en el \hyperlink{anexoA}{\textbf{Anexo A}} se muestran los registros Tiempo Historia con sus Espectros de Fourier, mientras que
+en el \hyperlink{anexoB}{\textbf{Anexo B}} se muestran los Espectros de Respuesta para cada estacion.
+
+\newpage
 
 \clearpage
 
@@ -221,18 +299,20 @@ print(r"\newpage")
 
 \vspace*{\fill}% * is needed here
 \noindent
-\raisebox{0.5cm}{
-\makebox[\textwidth]{\hfill {\fontsize{30}{10}\selectfont ANEXO \\ \\ \\ }\hfill }
+\raisebox{0.8cm}{
+\makebox[\textwidth]{\hfill {\fontsize{30}{10}\selectfont \hypertarget{anexoA}{ANEXO A}\\ \\ \\ }\hfill }
 }
 \raisebox{-0.5cm}{
 \makebox[\textwidth]{\\ \\ \hfill {\fontsize{24}{20}\selectfont REGISTROS TIEMPO HISTORIA \\  } \hfill }
+}
+\raisebox{-1.0cm}{
+\makebox[\textwidth]{\\ \\ \hfill {\fontsize{24}{20}\selectfont ESPECTROS DE FORURIER \\  } \hfill }
 }
 \vfill
 
 \clearpage
     
 \begin{pycode}
-
 for i in range(event.station.shape[0]):
     channel = event.station.iloc[i]["Channels"]
     fig = event.station.iloc[i]["Graf Acc_Four"]
@@ -248,6 +328,29 @@ for i in range(event.station.shape[0]):
 print(r"\clearpage")
 \end{pycode}
 \newpage
+
+
+\vspace*{\fill}% * is needed here
+\noindent
+\raisebox{0.8cm}{
+\makebox[\textwidth]{\hfill {\fontsize{30}{10}\selectfont \hypertarget{anexoB}{ANEXO B}\\ \\ \\ }\hfill }
+}
+\raisebox{-0.5cm}{
+\makebox[\textwidth]{\\ \\ \hfill {\fontsize{24}{20}\selectfont ESPECTROS DE RESPUESTA \\  } \hfill }
+}
+\vfill
+
+% \vspace*{\fill}% * is needed here
+% \noindent
+% \raisebox{0.5cm}{
+% \makebox[\textwidth]{\hfill {\fontsize{30}{10}\selectfont ANEXO B\\ \\ \\ }\hfill }
+% }
+% \raisebox{-0.5cm}{
+% \makebox[\textwidth]{\\ \\ \hfill {\fontsize{24}{20}\selectfont ESPECTROS DE RESPUESTA \\  } \hfill }
+% }
+% }
+% \vfill
+
 
 \listoffigures
 

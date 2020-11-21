@@ -1,7 +1,20 @@
-cd code-jj/Report
-pdflatex Report.tex
-cd /d/SHM/env/Scripts
-pythontex --interpreter "python:py" ../../code-jj/Report/Report.tex
 cd /d/SHM/code-jj/Report
 pdflatex Report.tex
-\py{PGA_max}
+
+cd /d/SHM/env/Scripts
+pythontex --interpreter "python:py" ../../code-jj/Report/Report.tex
+
+cd /d/SHM/code-jj/Report
+pdflatex Report.tex
+
+cd /d/SHM/env/Scripts
+pythontex --interpreter "python:py" ../../code-jj/Report/Report.tex
+
+cd /d/SHM/code-jj/Report
+pdflatex Report.tex
+
+https://accounts.google.com/signin/v2/challenge/pwd?continue=https%3A%2F%2Fmyaccount.google.com%2Flesssecureapps&service=accountsettings&osid=1&rart=ANgoxceHYOWJjCOvfbVvw6KDwadaOKu1PGhG4Z0oWUnSqDWN_XjiwNxq-_Hzv4IIyecON6nmr3h_-IyswzmQ29-8I2imXCmneQ&TL=AM3QAYY0dQJCh8PhjTXhvJ1-CWKUZVZKapcLRTrLcSadOQ7qsyqgEijHDZK1xBEI&flowName=GlifWebSignIn&cid=1&flowEntry=ServiceLogin
+
+https://realpython.com/python-send-email/
+cismid.remoed@gmail.com
+c15m1dr3m0ed
