@@ -46,15 +46,15 @@ event.save_event_properties('D:/SHM/code-jj/Report')
 event.purge_files(path_dir = 'D:/SHM/code-jj/Report/')
 
 #step 11) Generar el reporte
-print("Begining Latex compilation")
-os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
-os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
-os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
-os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
-os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+# print("Begining Latex compilation")
+# os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+# os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
+# os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+# os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
+# os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
 
 #step 12) Enviar el reporte para publicación
-event.send_email(report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "josdaroldplx@gmail.com", "josdarcoldplx@hotmail.com"])
+# event.send_email(report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "josdaroldplx@gmail.com", "josdarcoldplx@hotmail.com"])
 
 print("##############")
 print("#### Done ####")
