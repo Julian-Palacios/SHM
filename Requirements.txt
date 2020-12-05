@@ -11,10 +11,8 @@ cycler==0.10.0
 decorator==4.4.2
 descartes==1.1.0
 et-xmlfile==1.0.1
-Fiona @ file:///D:/SHM/env/Scripts/Fiona-1.8.17-cp38-cp38-win_amd64.whl
 freeze==3.0
 future==0.18.2
-GDAL @ file:///D:/SHM/env/Scripts/GDAL-3.1.4-cp38-cp38-win_amd64.whl
 geographiclib==1.50
 geopandas==0.8.1
 geopy==2.0.0
@@ -36,7 +34,6 @@ pyparsing==2.4.7
 pyproj==2.6.1.post1
 python-dateutil==2.8.1
 pytz==2020.4
-rasterio @ file:///D:/SHM/env/Scripts/rasterio-1.1.8-cp38-cp38-win_amd64.whl
 requests==2.24.0
 scipy==1.5.3
 Shapely==1.7.1
