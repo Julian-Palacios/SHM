@@ -30,7 +30,7 @@ for station in stations:
 
     # step 6) Creas las graficas de Aceleracion-Espectros de Fourier y de Respuesta.
     event.create_acc_fourier_graf(station, dpi=50, transparent=True)
-    event.create_sa_sd_graf(station)
+    event.create_acc_sa_graf(station, dpi=50, transparent=True)
 
 # step 7) Crear los mapas.
 event.createMap01(dpi=50, transparent=True)
@@ -46,15 +46,15 @@ event.save_event_properties('D:/SHM/code-jj/Report')
 event.purge_files(path_dir = 'D:/SHM/code-jj/Report/')
 
 #step 11) Generar el reporte
-# print("Begining Latex compilation")
-# os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
-# os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
-# os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
-# os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
-# os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+print("Begining Latex compilation")
+os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
+os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
+os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
 
 #step 12) Enviar el reporte para publicación
-# event.send_email(report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "josdaroldplx@gmail.com", "josdarcoldplx@hotmail.com"])
+event.send_email(report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "iinocentef@uni.pe", "jpalaciosf@uni.pe", "josdaroldplx@gmail.com"])
 
 print("##############")
 print("#### Done ####")

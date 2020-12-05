@@ -22,6 +22,12 @@ import matplotlib.patheffects as PathEffects
 from scipy import signal
 from copy import copy
 import pickle
+from math import e
+
+#
+from scipy.linalg import expm
+from numpy.linalg import pinv
+#
 
 import email, smtplib, ssl
 
@@ -44,6 +50,15 @@ station_params = {
     '007':{'Id':'CCEMOS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
     '008':{'Id':'LABEST', 'Name':'Laboratorio de Estructuras CISMID','Latitude': 0.0, 'Longitude': 0.0, 'Location':'CISMID FIC-UNI', 'Floors':2, 'N Sensors':2, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
     }
+
+
+# St = np.arange(1,202) # 20 seg
+# St = np.arange(1,126) # 2 seg
+
+# T = 0.0485246565*e**(0.0299572844*St)
+# T = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0,
+#                 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.05])
+T = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.05])
 
 def GL(f, fl, n):
     """
@@ -109,6 +124,87 @@ def parzem_smoothing(x, len_win_parzen=30):
 
 	return smooth
 
+def ins_resp(data, dt, periods, damping = 0.05):
+	'''  
+	The function generates pseudo-spectral acceleration (PSA), pseudo-spectral velocity (PSV) and spectral displacement (SD) spectra for given damping ratio (xi).
+	Spectral ordinates are for linear-elastic single-degree-of-freedom system with unit mass. 
+
+
+	Reference:
+	Wang, L.J. (1996). Processing of near-field earthquake accelerograms: Pasadena, California Institute of Technology.
+
+	This code is converted from Matlab code of Dr. Erol Kalkan, P.E.
+	Link:
+	https://www.mathworks.com/matlabcentral/fileexchange/57906-pseudo-spectral-acceleration--velocity-and-displacement-spectra?s_tid=prof_contriblnk
+
+	  INPUTS
+	  
+	data    = numpy array type object (in acceleration (cm/s^2))
+	dt      = sampling rate
+	periods = spectral periods 
+	damping       = damping factor (Default: 0.05)
+
+	  OUTPUTS
+	  
+	PSA = Pseudo-spectral acceleration ordinates
+	PSV = Pseudo-spectral velocity ordinates
+	SD  = spectral displacement ordinates
+
+	REQUIREMENTS:
+	scipy, numpy, os, matplotlib
+	'''
+
+	A = [];Ae = [];AeB = [];  
+	displ_max = np.empty((len(periods)))
+	veloc_max = np.empty((len(periods)))
+	absacc_max = np.empty((len(periods)))
+	foverm_max = np.empty((len(periods)))
+	pseudo_acc_max = np.empty((len(periods)))
+	pseudo_veloc_max = np.empty((len(periods)))
+	PSA = np.empty((len(periods)))
+	PSV = np.empty((len(periods)))
+	SD = np.empty((len(periods)))
+
+	acc = data
+	#vel = data[0].integrate(method='cumtrapz')
+	#dist = data[0].integrate(method='cumtrapz')
+
+	''' Spectral solution '''
+
+	for num,val in enumerate(periods):
+		omegan = 2*np.pi/val # Angular frequency
+		C = 2*damping*omegan # Two time of critical damping and angular freq.
+		K = omegan**2
+		y = np.zeros((2,len(acc)))
+		A = np.array([[0, 1], [-K, -C]])
+		Ae = expm(A*dt)
+		temp_1 = Ae-np.eye(2, dtype=int)
+		temp_2 = np.dot(Ae-np.eye(2, dtype=int),pinv(A))
+		AeB = np.dot(temp_2,np.array([[0.0],[1.0]]))
+
+		for k in np.arange(1,len(acc)):
+		  y[:,k] = np.reshape(np.add(np.reshape(np.dot(Ae,y[:,k-1]),(2,1)), np.dot(AeB,acc[k])),(2))
+
+		displ = np.transpose(y[0,:])	# Relative displacement vector (cm)
+		veloc = np.transpose(y[1,:])	# Relative velocity (cm/s)
+		foverm = (omegan**2)*displ		# Lateral resisting force over mass (cm/s2)
+		absacc = -2*damping*omegan*veloc-foverm	# Absolute acceleration from equilibrium (cm/s2)
+
+		''' Extract peak values '''
+		displ_max[num] = max(abs(displ))	# Spectral relative displacement (cm)
+		veloc_max[num] = max(abs(veloc))	# Spectral relative velocity (cm/s)
+		absacc_max[num] = max(abs(absacc))	# Spectral absolute acceleration (cm/s2)
+
+		foverm_max[num] = max(abs(foverm))			# Spectral value of lateral resisting force over mass (cm/s2)
+		pseudo_acc_max[num] = displ_max[num]*omegan**2	# Pseudo spectral acceleration (cm/s2)
+		pseudo_veloc_max[num] = displ_max[num]*omegan	# Pseudo spectral velocity (cm/s)
+
+		PSA[num] = pseudo_acc_max[num]	# PSA (cm/s2)
+		PSV[num] = pseudo_veloc_max[num]	# PSV (cm/s)
+		SD[num] = displ_max[num]		# SD  (cm)
+
+	return PSA, PSV, SD
+
 class Event:
 
     def __init__(self):
@@ -142,6 +238,7 @@ class Event:
         time = UTCDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
         utc_time = time + 5*3600
         data['UTC Hour'] = [str(utc_time.time)]
+        # self.event_waves_dir = data['CarpetaEvento'] 
         # self.event_waves_dir = '2020-08-14_18-23-10'
         self.event_waves_dir = '2020-11-15_08-42-16'
 
@@ -165,7 +262,8 @@ class Event:
             'Location':[station_params[cod]['Location']],
             'PGAs':[station.get_PGA()],
             'Channels':[station_params[cod]['Channels']],
-            'Graf Acc_Four':[['No path','No path','No path']]
+            'Graf Acc_Four':[['No path','No path','No path']],
+            'Graf Acc_Sa':['No path']
                             })
 
         self.station = self.station.append(row, ignore_index=True)
@@ -276,9 +374,23 @@ class Event:
         delta=max(ymax-ymin,xmax-xmin)
         # Asignacion de parametros en los ejes
         ax.axis((xmin, (xmin+delta), ymin, (ymin+delta)))
-        ax.tick_params(axis='both', which='major', labelsize=14,width=4,length = 10,direction="inout")
-        ax.tick_params(labeltop=True, labelright=True)
-        ax.tick_params(top=True, right=True)
+        # ax.tick_params(axis='both', which='major', labelsize=14,width=4,length = 10,direction="inout")
+        # ax.tick_params(axis='both', labeltop=False, labelright=False)
+        # ax.tick_params(top=False, right=False)
+        ax.tick_params(
+            axis='x',          # changes apply to the x-axis
+            which='both',      # both major and minor ticks are affected
+            bottom=False,      # ticks along the bottom edge are off
+            top=False,         # ticks along the top edge are off
+            labelbottom=False,
+            labeltop=False) # labels along the bottom edge are off
+        ax.tick_params(
+            axis='y',          # changes apply to the x-axis
+            which='both',      # both major and minor ticks are affected
+            right=False,      # ticks along the bottom edge are off
+            left=False,         # ticks along the top edge are off
+            labelleft=False,
+            labelright=False) # labels along the bottom edge are off
         #  Se coloca el norte
         # ax.text(x=(xmin+0.9*delta), y=(ymin+0.95*delta), s='N', fontsize=30, fontweight = 'bold')
         # ax.arrow((xmin+0.915*delta), (ymin+0.8*delta), 0, 0.1*delta, length_includes_head=True,
@@ -404,8 +516,69 @@ class Event:
 
         self.station.loc[self.station["Id"]==station.acc[0][0].stats.station, "Graf Acc_Four"] = pd.Series([path_grafs], index=index)
 
-    def create_sa_sd_graf(self, station):
-        pass
+    def create_acc_sa_graf(self, station, dpi=200, transparent=False):
+        z = lambda x: np.min(x) if np.absolute(np.min(x)) > np.absolute(np.max(x)) else np.max(x)
+        y_limit_acc = max([np.max(np.absolute(station.acc[0][i].data)) for i in range(3)])
+        y_limit_sa =  max([np.max(np.absolute(station.sa[i])) for i in range(3)])
+
+        nrows = 3
+        size_x = 16.0
+        size_y = 3.0 + 3.0*nrows
+        lw = 0.2
+        fs = 8
+        fs_ticks = 6
+        offset = 1.25
+
+        channels = self.station["Channels"][self.station["Id"]==station.acc[0][0].stats.station]
+        index = channels.index
+
+        mkdir = self.BASE_DIR + '/Figures/{}'.format(station.acc[0][0].stats.station)
+        if os.path.isdir(mkdir)==False:
+            os.makedirs(mkdir)
+
+        fig = plt.figure(constrained_layout=False, figsize=(size_x/2.54, size_y/2.54))
+        fig.text(0.015, 0.42, 'Aceleración ($cm/s^{2}$)', ha='center', rotation='vertical', fontstyle='oblique', fontsize=fs)
+        fig.text(0.654, 0.37, 'Pseudo Aceleración ($cm/s^{2}$)', ha='center', rotation='vertical', fontstyle='oblique', fontsize=fs)
+        
+        widths = [2 , 1]
+        heights = [1 for i in range(nrows)]
+        spec = fig.add_gridspec(ncols=2, nrows=nrows, width_ratios=widths, height_ratios=heights)
+
+        for i in range(3):
+            
+            # Acceleration
+            ax = fig.add_subplot(spec[i, 0])
+            ax.plot(station.acc[0][i].times(), station.acc[0][i].data, color='k', lw=lw, 
+                        label= 'Dirección: ' + station.acc[0][i].stats.channel + ' pico: ' +  '{:.2f}'.format(z(station.acc[0][i].data)) ) 
+            ax.legend(loc='upper right', fontsize=fs)
+            ax.grid(True, color='k', linestyle='-', linewidth=0.4, which='both', alpha = 0.2)
+            ax.set_xlabel('Tiempo (s)', fontsize=fs) if i == 2 else ax.set_xticklabels([])
+
+            ax.set_ylim( -y_limit_acc*offset, offset*y_limit_acc)
+            ax.set_xlim(station.acc[0][i].times()[0] , station.acc[0][i].times()[-1])
+            ax.xaxis.set_tick_params(labelsize=fs_ticks)
+            ax.yaxis.set_tick_params(labelsize=fs_ticks)
+            
+            # Sa Sd
+            ax = fig.add_subplot(spec[i, 1])
+            ax.plot(np.insert(T, 0, 0), np.insert(station.sa[i], 0, abs(z(station.acc[0][i].data))), color='k', lw=lw,
+                            label='Dirección: ' + station.acc[0][i].stats.channel )
+            ax.legend(loc='upper right', fontsize=fs)
+            ax.grid(True, color='k', linestyle='-', linewidth=0.4, which='both', alpha = 0.2)
+            ax.set_xlabel('Periodo (s)', fontsize=fs) if i == 2 else ax.set_xticklabels([])
+            ax.set_xlim(0.0 , 2.0)
+
+            ax.set_ylim(None, offset*y_limit_sa)
+            ax.xaxis.set_tick_params(labelsize=fs_ticks)
+            ax.yaxis.set_tick_params(labelsize=fs_ticks)
+
+        fig.subplots_adjust(left=0.08, bottom=0.08, right=0.98, top=0.98, hspace=0.0, wspace=0.25)
+        path = mkdir + '/Acc_Sa_{}.png'.format(station.acc[0][0].stats.station)
+        plt.savefig(path, dpi=dpi, transparent=transparent) 
+        strip_path = path.split('/Figures/')[-1]
+        # plt.show()
+        print("%s saved" %strip_path)
+        self.station.loc[self.station["Id"]==station.acc[0][0].stats.station, "Graf Acc_Sa"] = pd.Series([strip_path], index=index)
 
     def _max_value_channel(self, station, option='acc'):
         """
@@ -423,16 +596,26 @@ class Event:
 
         if option == 'acc':
             data = station.acc
+            for i in range(3):
+                max_value = max([ np.max(np.absolute(itk[i].data)) for itk in data ])
+                max_values.append(max_value)
+
         if option == 'fourier':
             data = station.fourier
-        if option == 'sa_sd':
-            data = station.sa_sd
+            for i in range(3):
+                max_value = max([ np.max(np.absolute(itk[i].data)) for itk in data ])
+                max_values.append(max_value)
+            
+        if option == 'sa':
+            for i in range(3):
+                max_value = max([ np.max(np.absolute(sa)) for sa in station.sa ])
+                max_values.append(max_value)
+   
+        if option == 'sd':
+            for i in range(3):
+                max_value = max([ np.max(np.absolute(sd)) for sd in station.sd ])
+                max_values.append(max_value)
 
-        for i in range(3):
-            max_value = max([ np.max(np.absolute(itk[i].data)) for itk in data ])
-            max_values.append(max_value)
-
-        # print(max_values)
         return max_values
 
     def _get_y_limits(self, x):
@@ -485,30 +668,31 @@ class Event:
             except:
                 print(file + " No Found.")        
 
-    def send_email(self, report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe"]):
+    def send_email(self, report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers =  ["jjaramillod@uni.pe", "josdaroldplx@gmail.com", "josdarcoldplx@hotmail.com"]):
 
-        subject = "Reporte Sísmico del sismo ...."
-        body = "Este es una prueba de envio reporte sismico a los correo tal......"
+        subject = "Acelerogramas del Sismo de %s del %s" %(self.epicenter["Place"].iloc[0], self.epicenter["Date"].iloc[0])
+        body = "Esta es una prueba de envio automático de Reporte Sismico"
         sender_email = "cismid.remoed@gmail.com"
-        receiver_email = ','.join(receivers) if len(receivers)>1 else receivers[0]
+        receiver_email = receivers
+        # receiver_email = receivers
         password = "c15m1dr3m0ed"
 
         # Create a multipart message and set headers
         message = MIMEMultipart()
         message["From"] = sender_email
-        message["To"] = receiver_email
+        message["To"] = ", ".join(receivers)
         message["Subject"] = subject
-        # message["Bcc"] = receiver_email  # Recommended for mass emails
+        message["Bcc"] = ", ".join(receivers) # Recommended for mass emails
 
         html = """\
         <html>
         <body>
-            <p>Hi,<br>
-            How are you?<br>
-            <a href="http://www.realpython.com">Real Python</a> 
-            has many great tutorials.
+            <p>Saludos Estimados, Este es un mensaje de prueba de envio automático  de Reporte Sísmico generado con python. <br>
+            Referencia: 
+            <a href="http://www.realpython.com"></a> 
             </p>
-            <b> jajaja </b>
+            <br>
+            <b> Atte: Joseph Jaramillo del Aguila.</b>
         </body>
         </html>
         """
@@ -545,7 +729,8 @@ class Event:
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, text)
+            # server.sendmail(sender_email, receiver_email, text)
+            server.sendmail(message["From"], receiver_email, text)
 
         print("#### Email send ####")
 
@@ -572,7 +757,8 @@ class Station:
         self.vel = []
         self.desp = []
         self.fourier = []
-        self.sa_sd = []
+        self.sa = []
+        self.sd = []
         self.BASE_DIR = str(Path(__file__).resolve(strict=True).parent.parent).replace("\\",'/')
         self.cod = ''
 
@@ -728,18 +914,41 @@ class Station:
         return copy(self.PGAs)
 
     def get_sa_sd(self):
-        pass
+        # s = np.arange(1,202)
+        # T = 0.0485246565*e**(0.0299572844*s)
 
+        dt = 0.01 # para itks
+
+        for i in range(3):
+            Sa, Sv, Sd = ins_resp(self.acc[0][i], dt, T,  damping=0.05)
+            self.sa.append(Sa)
+            self.sd.append(Sd)
+        
 if __name__ == '__main__':
-    from obspy.core import UTCDateTime
-    
-    # print(x)
-    # import datetime
-
+    # step 1) Leer el evento del IGP y crear el objeto de la clase Event.
     event = Event()
-    event2 = Event()
-    event.load_event2('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0709.sav')
-    event2.load_event('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0675.txt')
-    print(event.epicenter)
-    print(event2.epicenter)
+    # event.load_event('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0675.txt')
+    event.load_event('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0709.sav')
+    # print(event.epicenter)
 
+    # step 2) leer la carpeta donde se encuentras los registros de las estaciones.
+    path_event = 'D:/SHM/code-jj/Events/%s' %event.event_waves_dir
+    with os.scandir(path_event) as f:
+        s = [f.name for f in f if f.is_dir()]
+
+    # step 3) Cargar los datos de las estaciones creando los objetos de la clase Station.
+    stations = [Station(path_event + '/%s' %i) for i in s]
+
+    for station in stations:
+        station.baseLine(type='spline',order=2,dspline=1000) 
+        # station.get_fourier(smooth_grade=25)
+        station.get_sa_sd()
+
+        event.add_station(station)
+
+        # event.create_acc_fourier_graf(station, dpi=50, transparent=True)
+
+        # station.get_sa_sd()
+
+        event.create_acc_sa_graf(station, dpi=50, transparent=False)
+        # station.acc[0][0].plot()
