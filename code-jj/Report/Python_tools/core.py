@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on December 2020
+
+@author: Joseph Jaramillo
+"""
+
 import numpy as np
 from pathlib import Path
 import os
@@ -563,7 +570,7 @@ class Event:
             
             # Sa Sd
             ax = fig.add_subplot(spec[i, 1])
-            ax.plot(np.insert(T, 0, 0), np.insert(station.sa[i], 0, abs(z(station.acc[0][i].data))), color='k', lw=lw,
+            ax.plot(np.insert(T, 0, 0), np.insert(station.sa[i], 0, abs(z(station.acc[0][i].data))), color='k', lw=2*lw,
                             label='Dirección: ' + station.acc[0][i].stats.channel )
             ax.legend(loc='upper right', fontsize=fs)
             ax.grid(True, color='k', linestyle='-', linewidth=0.4, which='both', alpha = 0.2)
@@ -690,11 +697,11 @@ class Event:
         <html>
         <body>
             <p>Saludos Estimados, Este es un mensaje de prueba de envio automático  de Reporte Sísmico generado con python. <br>
-            Referencia: 
+            Referencia: <br>
             <a href="http://www.realpython.com"></a> 
-            </p>
             <br>
             <b> Atte: Joseph Jaramillo del Aguila.</b>
+            </p>
         </body>
         </html>
         """

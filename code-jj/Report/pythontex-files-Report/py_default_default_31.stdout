@@ -1,0 +1,64 @@
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección EW.}
+\label{fig: figura_FICUNI/Acc_Four_EW}
+\centering
+\includegraphics{FICUNI/Acc_Four_EW}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección NS.}
+\label{fig: figura_FICUNI/Acc_Four_NS}
+\centering
+\includegraphics{FICUNI/Acc_Four_NS}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección UD.}
+\label{fig: figura_FICUNI/Acc_Four_UD}
+\centering
+\includegraphics{FICUNI/Acc_Four_UD}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección NS.}
+\label{fig: figura_PABUNI/Acc_Four_NS}
+\centering
+\includegraphics{PABUNI/Acc_Four_NS}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección EW.}
+\label{fig: figura_PABUNI/Acc_Four_EW}
+\centering
+\includegraphics{PABUNI/Acc_Four_EW}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección UD.}
+\label{fig: figura_PABUNI/Acc_Four_UD}
+\centering
+\includegraphics{PABUNI/Acc_Four_UD}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección NS.}
+\label{fig: figura_CIIFIC/Acc_Four_NS}
+\centering
+\includegraphics{CIIFIC/Acc_Four_NS}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección EW.}
+\label{fig: figura_CIIFIC/Acc_Four_EW}
+\centering
+\includegraphics{CIIFIC/Acc_Four_EW}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección UD.}
+\label{fig: figura_CIIFIC/Acc_Four_UD}
+\centering
+\includegraphics{CIIFIC/Acc_Four_UD}
+\end{figure}
+\newpage
+\clearpage

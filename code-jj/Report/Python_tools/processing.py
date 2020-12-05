@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on December 2020
+
+@author: Joseph Jaramillo
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal, integrate

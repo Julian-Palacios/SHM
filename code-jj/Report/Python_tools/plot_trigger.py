@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on December 2020
+
+@author: Joseph Jaramillo
+"""
+
+
 import matplotlib.pylab as plt
 import numpy as np
 from obspy.signal.trigger import trigger_onset #triggerOnset

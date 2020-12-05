@@ -1,0 +1,22 @@
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Respuesta de la estación FICUNI en las 3 direcciones.}
+\label{fig: figura_FICUNI/Acc_Sa_FICUNI}
+\centering
+\includegraphics{FICUNI/Acc_Sa_FICUNI}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Respuesta de la estación PABUNI en las 3 direcciones.}
+\label{fig: figura_PABUNI/Acc_Sa_PABUNI}
+\centering
+\includegraphics{PABUNI/Acc_Sa_PABUNI}
+\end{figure}
+\newpage
+\begin{figure}[!ht]
+\caption{Registro de Acerelaciones y Espectros de Respuesta de la estación CIIFIC en las 3 direcciones.}
+\label{fig: figura_CIIFIC/Acc_Sa_CIIFIC}
+\centering
+\includegraphics{CIIFIC/Acc_Sa_CIIFIC}
+\end{figure}
+\newpage
+\clearpage

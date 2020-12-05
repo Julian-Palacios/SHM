@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on December 2020
+
+@author: Joseph Jaramillo
+"""
+
+
 from Python_tools.core import Event, Station
 import os 
 import pickle
@@ -29,12 +37,12 @@ for station in stations:
     event.add_station(station)
 
     # step 6) Creas las graficas de Aceleracion-Espectros de Fourier y de Respuesta.
-    event.create_acc_fourier_graf(station, dpi=50, transparent=True)
-    event.create_acc_sa_graf(station, dpi=200, transparent=True)
+    event.create_acc_fourier_graf(station, dpi=250, transparent=True)
+    event.create_acc_sa_graf(station, dpi=250, transparent=True)
 
 # step 7) Crear los mapas.
-event.createMap01(dpi=50, transparent=True)
-event.createMap02(dpi=50, transparent=True)
+event.createMap01(dpi=250, transparent=True)
+event.createMap02(dpi=250, transparent=True)
 
 # strp 8) Obtener la estación cuyo PGA es máximo (Esencial para la generación del reporte).
 event.get_max_station()
@@ -47,14 +55,14 @@ event.purge_files(path_dir = '/home/joseph/SHM/code-jj/Report/')
 
 #step 11) Generar el reporte
 print("Begining Latex compilation")
-#os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
-#os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
-#os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
-#os.system('pushd d:\SHM\env\Scripts && activate && pythontex --interpreter "python:py" ..\..\code-jj\Report\Report.tex')
-#os.system('pushd d:\SHM\code-jj\Report && pdflatex Report.tex')
+os.system('pdflatex /home/joseph/SHM/code-jj/Report/Report.tex')
+os.system('pythontex /home/joseph/SHM/code-jj/Report/Report.tex')
+os.system('pdflatex /home/joseph/SHM/code-jj/Report/Report.tex')
+os.system('pythontex /home/joseph/SHM/code-jj/Report/Report.tex')
+os.system('pdflatex /home/joseph/SHM/code-jj/Report/Report.tex')
 
 #step 12) Enviar el reporte para publicación
-#event.send_email(report_path= "D:/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "iinocentef@uni.pe", "jpalaciosf@uni.pe", "josdaroldplx@gmail.com"])
+event.send_email(report_path= "/home/joseph/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "iinocentef@uni.pe", "jpalaciosf@uni.pe","mdiazf@uni.edu.pe" ,"josdaroldplx@gmail.com"])
 
 print("##############")
 print("#### Done ####")

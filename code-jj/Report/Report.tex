@@ -30,7 +30,7 @@
 \usepackage{lipsum}
 \usepackage[font=small,labelfont=bf]{caption}
 %\usetikzlibrary{arrows,patterns}
-\pgfplotsset{compat=1.15}
+%\pgfplotsset{compat=1.15}
 
 % \usepackage{pst-node}
 % \usepackage{pst-plot}
@@ -155,7 +155,7 @@ SÍSMICAS Y MITIGACIÓN DE DESASTRES\\
 from Python_tools.core import Event
 import pandas as pd
 
-event = Event.load_event_properties('D:/SHM/code-jj/Report/Event.sav')
+event = Event.load_event_properties('./Event.sav')
 
 lugar = event.epicenter["Place"].iloc[0]
 fecha = event.epicenter["Date"].iloc[0]
