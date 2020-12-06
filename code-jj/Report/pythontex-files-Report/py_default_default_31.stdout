@@ -1,64 +1,64 @@
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección EW.}
-\label{fig: figura_FICUNI/Acc_Four_EW}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección E.}
+\label{fig: figura_FICUNI/Acc_Four_E}
 \centering
-\includegraphics{FICUNI/Acc_Four_EW}
+\includegraphics{FICUNI/Acc_Four_E}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección NS.}
-\label{fig: figura_FICUNI/Acc_Four_NS}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección N.}
+\label{fig: figura_FICUNI/Acc_Four_N}
 \centering
-\includegraphics{FICUNI/Acc_Four_NS}
+\includegraphics{FICUNI/Acc_Four_N}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección UD.}
-\label{fig: figura_FICUNI/Acc_Four_UD}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación FICUNI en dirección Z.}
+\label{fig: figura_FICUNI/Acc_Four_Z}
 \centering
-\includegraphics{FICUNI/Acc_Four_UD}
+\includegraphics{FICUNI/Acc_Four_Z}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección NS.}
-\label{fig: figura_PABUNI/Acc_Four_NS}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección N.}
+\label{fig: figura_PABUNI/Acc_Four_N}
 \centering
-\includegraphics{PABUNI/Acc_Four_NS}
+\includegraphics{PABUNI/Acc_Four_N}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección EW.}
-\label{fig: figura_PABUNI/Acc_Four_EW}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección E.}
+\label{fig: figura_PABUNI/Acc_Four_E}
 \centering
-\includegraphics{PABUNI/Acc_Four_EW}
+\includegraphics{PABUNI/Acc_Four_E}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección UD.}
-\label{fig: figura_PABUNI/Acc_Four_UD}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación PABUNI en dirección Z.}
+\label{fig: figura_PABUNI/Acc_Four_Z}
 \centering
-\includegraphics{PABUNI/Acc_Four_UD}
+\includegraphics{PABUNI/Acc_Four_Z}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección NS.}
-\label{fig: figura_CIIFIC/Acc_Four_NS}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección N.}
+\label{fig: figura_CIIFIC/Acc_Four_N}
 \centering
-\includegraphics{CIIFIC/Acc_Four_NS}
+\includegraphics{CIIFIC/Acc_Four_N}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección EW.}
-\label{fig: figura_CIIFIC/Acc_Four_EW}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección E.}
+\label{fig: figura_CIIFIC/Acc_Four_E}
 \centering
-\includegraphics{CIIFIC/Acc_Four_EW}
+\includegraphics{CIIFIC/Acc_Four_E}
 \end{figure}
 \newpage
 \begin{figure}[!ht]
-\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección UD.}
-\label{fig: figura_CIIFIC/Acc_Four_UD}
+\caption{Registro de Acerelaciones y Espectros de Fourier de la estación CIIFIC en dirección Z.}
+\label{fig: figura_CIIFIC/Acc_Four_Z}
 \centering
-\includegraphics{CIIFIC/Acc_Four_UD}
+\includegraphics{CIIFIC/Acc_Four_Z}
 \end{figure}
 \newpage
 \clearpage

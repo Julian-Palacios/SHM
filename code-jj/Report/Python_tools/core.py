@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on December 2020
-
 @author: Joseph Jaramillo
 """
 
 import numpy as np
 from pathlib import Path
 import os
-import sys
+import sys, shutil
 
 from obspy.core import read, UTCDateTime
 from obspy.core.stream import Stream
@@ -30,12 +29,10 @@ from scipy import signal
 from copy import copy
 import pickle
 from math import e
-
 #
 from scipy.linalg import expm
 from numpy.linalg import pinv
 #
-
 import email, smtplib, ssl
 
 from email import encoders
@@ -48,26 +45,19 @@ import modulo
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 station_params = {
-    '001':{'Id':'PABUNI', 'Name':'Pabellón Central UNI','Latitude':-12.0236, 'Longitude':-77.0483, 'Location':'Pabellón-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Channels':["NS","EW","UD"], 'Skip Header':0, 'Use Columns':[2,3,4],'Scale':1,'Delimiter':','},
-    # '001':{'Id':'PABUNI', 'Name':'Pabellón Central UNI','Latitude':-12.03, 'Longitude':-77.08, 'Location':'Pabellón-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Channels':["NS","EW","UD"], 'Skip Header':0, 'Use Columns':[2,3,4],'Scale':1,'Delimiter':','},
-    '002':{'Id':'FICUNI', 'Name':'Facultad de Ingeniería Civil UNI','Latitude': -12.0218, 'Longitude': -77.049, 'Location':'FIC-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Channels':["EW","NS","UD"], 'Skip Header':4, 'Use Columns':[1,2,3],'Scale':4280,'Delimiter':'	'},
-    '003':{'Id':'HERMBA', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
-    '004':{'Id':'CIPTAR', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
-    '005':{'Id':'MLAMAS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
-    '006':{'Id':'CIIFIC', 'Name':'CIIFIC UNI','Latitude': -12.0215, 'Longitude': -77.0492, 'Location':'CIIFIC-UNI, Rímac-Lima', 'Floors':8, 'N Sensors':4, 'Channels':["NS", "EW", "UD"], 'Skip Header':0, 'Use Columns':[2,3,4],'Scale':1,'Delimiter':','},
-    '007':{'Id':'CCEMOS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
-    '008':{'Id':'LABEST', 'Name':'Laboratorio de Estructuras CISMID','Latitude': 0.0, 'Longitude': 0.0, 'Location':'CISMID FIC-UNI', 'Floors':2, 'N Sensors':2, 'Channels':["NS", "EW", "UD"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
+    '001':{'Id':'PABUNI', 'Name':'Pabellón Central UNI','Latitude':-12.0236, 'Longitude':-77.0483, 'Location':'Pabellón-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Channels':["N","E","Z"], 'Skip Header':0, 'Use Columns':[2,3,4],'Scale':1,'Delimiter':','},
+    '002':{'Id':'FICUNI', 'Name':'Facultad de Ingeniería Civil UNI','Latitude': -12.0218, 'Longitude': -77.049, 'Location':'FIC-UNI, Rímac-Lima', 'Floors':3, 'N Sensors':5, 'Channels':["E","N","Z"], 'Skip Header':4, 'Use Columns':[1,2,3],'Scale':4280,'Delimiter':'	'},
+    '003':{'Id':'HERMBA', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["N", "E", "Z"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
+    '004':{'Id':'CIPTAR', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["N", "E", "Z"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
+    '005':{'Id':'MLAMAS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["N", "E", "Z"], 'Skip Header':0, 'Use Columns':[2,3,4],'Scale':1,'Delimiter':','},
+    '006':{'Id':'CIIFIC', 'Name':'CIIFIC UNI','Latitude': -12.0215, 'Longitude': -77.0492, 'Location':'CIIFIC-UNI, Rímac-Lima', 'Floors':8, 'N Sensors':4, 'Channels':["N", "E", "Z"], 'Skip Header':0, 'Use Columns':[2,3,4],'Scale':1,'Delimiter':','},
+    '007':{'Id':'CCEMOS', 'Name':'','Latitude': 0.0, 'Longitude': 0.0, 'Location':'', 'Floors':0, 'N Sensors':0, 'Channels':["N", "E", "Z"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
+    '008':{'Id':'LABEST', 'Name':'Laboratorio de Estructuras CISMID','Latitude': 0.0, 'Longitude': 0.0, 'Location':'CISMID FIC-UNI', 'Floors':2, 'N Sensors':2, 'Channels':["N", "E", "Z"], 'Skip Header':'', 'Use Columns':'','Scale':'','Delimiter':''},
     }
 
-
 # St = np.arange(1,202) # 20 seg
-
 St = np.arange(1,126) # 2 seg
 T = 0.0485246565*e**(0.0299572844*St)
-
-# T = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0,
-#                 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.05])
-#T = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.05])
 
 def GL(f, fl, n):
     """
@@ -234,7 +224,7 @@ class Event:
         data['Longitude'] = [d['Longitud']]
         data['Name'] = ['Epicentro']
         day, month, year = d['FechaLocal'].split('/')
-        day = day[1:-1] if day[0] == '0' else day[:]
+        day = day[1:] if day[0] == '0' else day[:]
         date = day + ' de ' + months[month] + ' del ' + year
         data['Date'] = [date]
         data['Local Hour'] = [d['HoraLocal']]
@@ -244,7 +234,9 @@ class Event:
         data['Place'] = [d['Referencia'].split('de ')[-1]]
         data['Institution'] = ['IGP']
         hour, minute, second = d['HoraLocal'].split(':')
-        time = UTCDateTime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+
+        time = UTCDateTime(int(year), int(month), int(float(day)), int(hour), int(minute), int(second))
+        
         utc_time = time + 5*3600
         data['UTC Hour'] = [str(utc_time.time)]
         # self.event_waves_dir = data['CarpetaEvento'] 
@@ -661,14 +653,15 @@ class Event:
         print("Event Properties Saved")
 
     def purge_files(self, path_dir):
+        print(path_dir + 'pythontex-files-Report')
         list_remove = ["Report.aux", "Report.fdb_latexmk", "Report.fls", "Report.lof", 
                         "Report.log", "Report.lot", "Report.out", "Report.pdf", "Report.pytxcode" ]
 
         try:
-            shutil.rmtree(path_dir + 'pythontex-files-report')
+            shutil.rmtree(path_dir + 'pythontex-files-Report')
             print('pythontex-files-report Deleted')
-        except:
-            print("'pythontex-files-report' no Found")
+        except Exception as e:
+            print("'pythontex-files-report' no Found"); print(e)
 
         for file in list_remove:
             try:

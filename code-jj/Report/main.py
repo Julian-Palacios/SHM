@@ -12,14 +12,14 @@ import pickle
 import pandas as pd
 import shutil
 
+base = '/home/joseph'
 # step 1) Leer el evento del IGP y crear el objeto de la clase Event.
 event = Event()
 # event.load_event('D:/SHM/code-jj/Events/IGP EVENTOS/2020-0675.txt')
-event.load_event('/home/joseph/SHM/code-jj/Events/IGP EVENTOS/2020-0709.sav')
-# print(event.epicenter)
+event.load_event(base + '/PROGRAMA_REPORTE/IGP EVENTOS/UltimoSismo.sav')
 
 # step 2) leer la carpeta donde se encuentras los registros de las estaciones.
-path_event = '/home/joseph/SHM/code-jj/Events/%s' %event.event_waves_dir
+path_event = base + '/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Events/%s' %event.event_waves_dir
 with os.scandir(path_event) as f:
     s = [f.name for f in f if f.is_dir()]
 
@@ -48,21 +48,22 @@ event.createMap02(dpi=250, transparent=True)
 event.get_max_station()
 
 # step 9) Guardar las propiedades del Evento (Esencial para la generación del reporte).
-event.save_event_properties('/home/joseph/SHM/code-jj/Report')
+event.save_event_properties(base + '/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report')
 
 #step 10) Depurar los archivos generados automaticamente por latex en la anterior ejecución
-event.purge_files(path_dir = '/home/joseph/SHM/code-jj/Report/')
+event.purge_files(path_dir = base + '/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/')
+
 
 #step 11) Generar el reporte
 print("Begining Latex compilation")
-os.system('pdflatex /home/joseph/SHM/code-jj/Report/Report.tex')
-os.system('pythontex /home/joseph/SHM/code-jj/Report/Report.tex')
-os.system('pdflatex /home/joseph/SHM/code-jj/Report/Report.tex')
-os.system('pythontex /home/joseph/SHM/code-jj/Report/Report.tex')
-os.system('pdflatex /home/joseph/SHM/code-jj/Report/Report.tex')
+os.system('pdflatex %s/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/Report.tex' %base) 
+os.system('pythontex %s/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/Report.tex' %base)
+os.system('pdflatex %s/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/Report.tex' %base)
+os.system('pythontex %s/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/Report.tex' %base)
+os.system('pdflatex %s/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/Report.tex' %base)
 
 #step 12) Enviar el reporte para publicación
-event.send_email(report_path= "/home/joseph/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "iinocentef@uni.pe", "jpalaciosf@uni.pe","mdiazf@uni.edu.pe" ,"josdaroldplx@gmail.com"])
+event.send_email(report_path= base + "/PROGRAMA_REPORTE/REMOED/SHM/code-jj/Report/Report.pdf", receivers = ["jjaramillod@uni.pe", "iinocentef@uni.pe", "jpalaciose@uni.pe" ,"josdaroldplx@gmail.com, khuertag@uni.pe"])
 
 print("##############")
 print("#### Done ####")

@@ -1,20 +1,20 @@
 \renewcommand{\arraystretch}{1.2}
 \begin{longtable}{|c|c|c|c|}
-\caption{Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de Sta. Maria De Nieva, Condorcanqui - Amazonas del 17 de noviembre del 2020 a las 19:49:03 (hora local)}\label{tab:tab02}\\
+\caption{Aceleraciones máximas registrados en las estaciones acelerográficas ubicadas en la ciudad de Lima correspondientes al sismo de Atalaya, Atalaya - Ucayali del 5 de diciembre del 2020 a las 05:50:45 (hora local)}\label{tab:tab02}\\
 \hline
 \textbf{Código} & \textbf{Orientación} & \textbf{Ubicación (Provincia, Departamento)} & \textbf{\begin{tabular}[c]{@{}c@{}}PGA\\ (cm/s2)\end{tabular}} \\ \hline
 \endfirsthead
 \endhead
 \endfoot
 \endlastfoot
-\multirow{3}{*}{FICUNI}  & EW & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} FIC-UNI, Rímac-Lima\end{tabulary}}  & -1.87 \\ \cline{2-2} \cline{4-4}
- & NS &  & 1.79 \\ \cline{2-2} \cline{4-4}
- & UD &  & 0.04 \\ \hline
-\multirow{3}{*}{PABUNI}  & NS & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} Pabellón-UNI, Rímac-Lima\end{tabulary}}  & -2.50 \\ \cline{2-2} \cline{4-4}
- & EW &  & 3.06 \\ \cline{2-2} \cline{4-4}
- & UD &  & -2.18 \\ \hline
-\multirow{3}{*}{CIIFIC}  & NS & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} CIIFIC-UNI, Rímac-Lima\end{tabulary}}  & 1.84 \\ \cline{2-2} \cline{4-4}
- & EW &  & -1.64 \\ \cline{2-2} \cline{4-4}
- & UD &  & -1.56 \\ \hline
+\multirow{3}{*}{FICUNI}  & E & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} FIC-UNI, Rímac-Lima\end{tabulary}}  & -1.87 \\ \cline{2-2} \cline{4-4}
+ & N &  & 1.79 \\ \cline{2-2} \cline{4-4}
+ & Z &  & 0.04 \\ \hline
+\multirow{3}{*}{PABUNI}  & N & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} Pabellón-UNI, Rímac-Lima\end{tabulary}}  & -2.50 \\ \cline{2-2} \cline{4-4}
+ & E &  & 3.06 \\ \cline{2-2} \cline{4-4}
+ & Z &  & -2.18 \\ \hline
+\multirow{3}{*}{CIIFIC}  & N & \multirow{3}{*}{\begin{tabulary}{8cm}{@{}C@{}} CIIFIC-UNI, Rímac-Lima\end{tabulary}}  & 1.84 \\ \cline{2-2} \cline{4-4}
+ & E &  & -1.64 \\ \cline{2-2} \cline{4-4}
+ & Z &  & -1.56 \\ \hline
 \end{longtable}
 \newpage
